@@ -1,11 +1,8 @@
-//#include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
 #include "thzcbs.h"
 #include "cppfbp.h"
 #include <stdlib.h>
-//#define FALSE 0
-//#define TRUE 1
 #define INPUT 0
 #define OUTPUT 1
 
@@ -24,21 +21,21 @@ int thzrecvc(Process *proc, void **ptr, char * port,
 	port_ent pe;
 
 	if (p == 0) 
-		strcpy_s (port_name, port);
+		strcpy (port_name, port);
 	else {
 		q = strchr(p, ']');
 		auto n = q - p - 1;
 		char no[10];		
-		strncpy_s(no, p + 1, n);
+		strncpy(no, p + 1, n);
 		elem_no = atoi(no);
 		char * r = port;
-		strncpy_s (port_name, port, p - r);
+		strncpy (port_name, port, p - r);
 		port_name[p - r] = '\0';
 	}
 
 	//port_ent* pe = (port_ent *) malloc(sizeof(port_ent));   
 
-	strcpy_s(pe.port_name, port_name);
+	strcpy(pe.port_name, port_name);
 	Port * cpp = proc -> in_ports;
 	while (cpp != 0)
 	{
@@ -77,6 +74,7 @@ int thzrecv(Process *proc, void **ptr, port_ent *peptr, int elem_no,
 	IIP *IIPptr;
 	IPh   *created_IIP_ptr;
 	void *created_ptr;
+	char options[] = {"OPTIONS"};
 	//extern void run(Process * proc);
 
 	if (peptr -> ret_code == 2) {
@@ -90,14 +88,14 @@ int thzrecv(Process *proc, void **ptr, port_ent *peptr, int elem_no,
 	if (cpp -> elem_list[elem_no].is_IIP) {
 		IIPptr = cpp -> elem_list[elem_no].gen.IIPptr;
 		auto j = strlen(IIPptr -> datapart);
-		value = thzcrep(proc, &created_ptr, static_cast<int>(j + 1), "OPTIONS");
+		value = thzcrep(proc, &created_ptr, static_cast<int>(j + 1), options);
 		created_IIP_ptr = (IPh   *) created_ptr - 1;
 		memcpy (created_ptr, IIPptr -> datapart, j + 1);
-		cpp -> elem_list[elem_no].closed = TRUE;
+		cpp -> elem_list[elem_no].closed = true;
 		*ptr = created_ptr;
 		*size = created_IIP_ptr -> IP_size;
 		*typep = created_IIP_ptr -> type;
-		cpp -> elem_list[elem_no].closed = TRUE;
+		cpp -> elem_list[elem_no].closed = true;
 
 		if (proc -> trace) MSG1("%s Recv end\n", proc -> procname);
 		return(0);
@@ -188,6 +186,6 @@ X: IPptr = cnp -> first_IPptr;
 	value = 0;
 retn:
 	
-	proc -> network -> active = TRUE;
+	proc -> network -> active = true;
 	return(value);
 }

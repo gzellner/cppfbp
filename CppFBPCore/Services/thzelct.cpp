@@ -8,15 +8,15 @@ int thzelctc(Process *proc, char * port)
 	char * p = strchr(port, '[');
 	char * q;
 	if (p == 0) 
-		strcpy_s (port_name, port);
+		strcpy (port_name, port);
 	else {
 		q = strchr(p, ']');
 		auto n = q - p - 1;
 		char no[10];		
-		strncpy_s(no, p + 1, n);
+		strncpy(no, p + 1, n);
 		elem_no = atoi(no);
 		char * r = port;
-		strncpy_s (port_name, port, p - r);
+		strncpy (port_name, port, p - r);
 		port_name[p - r] = '\0';
 	}
 	Port * cpp = proc -> in_ports;

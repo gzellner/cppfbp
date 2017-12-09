@@ -1,20 +1,17 @@
 #pragma optimize( "", off )
 #include <stdio.h>
 #include <malloc.h>
-#include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-
 #include "cppfbp.h"
 #include "thzcbs.h"
-#define TRUE 1
-#define FALSE 0
+#include <stdlib.h>
 
-#if __OS2__ == 1
-#define getc fgetc
-#undef  EOF
-#define EOF 0xff
-#endif 
+// #if __OS2__ == 1
+// #define getc fgetc
+// #undef  EOF
+// #define EOF 0xff
+// #endif 
 
 
 #define TC(label,ch) { if (curr_char != ch) goto label; \
@@ -59,7 +56,7 @@ proc_ent *find_or_build_proc(char * nm);
 proc_ent *proc_tab;
 label_ent *label_curr;
 char comp_name[200];
-bool eof_found = FALSE;
+bool eof_found = false;
 char eol = '\n';
 
 /*
@@ -108,8 +105,8 @@ int thxscan(FILE *fp, label_ent *label_tab, char file_name[10])
 	cnxt_tab = 0;	
 	label_curr = label_tab;
 
-	strcpy_s(label_curr->label," ");
-	strcpy_s(label_curr->file, file_name);
+	strcpy(label_curr->label," ");
+	strcpy(label_curr->file, file_name);
 	label_curr->ent_type = 'L';
 
 	IIPlen = -1;
@@ -129,7 +126,7 @@ X0:
 	}
 	scan_blanks(fp);
 	TCO(X2,':');
-	strcpy_s(label_curr->label, out_str);  // it was a label		  
+	strcpy(label_curr->label, out_str);  // it was a label		  
 	printf("Scanning Network: %s\n",out_str);
 
 bigloop:	
@@ -149,10 +146,10 @@ X1:
 		goto exit;  
 	}
 X2:
-	strcpy_s(procname, out_str);  
+	strcpy(procname, out_str);  
 	printf("Procname: %s\n", procname);
 	if (cnxt_hold != 0) {
-		strcpy_s(cnxt_hold -> downstream_name, procname);
+		strcpy(cnxt_hold -> downstream_name, procname);
 		cnxt_hold = 0;
 	}
 
@@ -217,13 +214,13 @@ NN2:
 	*o_ptr = '\0';
 
 	if (strlen(comp_name) > 0) {
-		strcpy_s(proc_curr -> comp_name, comp_name);
+		strcpy(proc_curr -> comp_name, comp_name);
 		printf("Comp name: %s\n",comp_name); 
 	}
 
 NB1: 
 	// comp scanned off, if any
-	strcpy_s(upstream_name, procname);	    // in case this proc is the upstream of another arrow
+	strcpy(upstream_name, procname);	    // in case this proc is the upstream of another arrow
 	
 	scan_blanks(fp);
 
@@ -253,7 +250,7 @@ NQ1:
 
 
 	TCO(tsc,EOF);
-	eof_found = TRUE;
+	eof_found = true;
 	goto nxtnet;
 
 tsc:
@@ -288,7 +285,7 @@ outport:
 GUy:
 	scan_blanks(fp);
 	
-	strcpy_s(upstream_port_name, out_str);
+	strcpy(upstream_port_name, out_str);
 	printf("Upstream port: %s\n", out_str);
 	upstream_elem_no = 0;
 	TCO(tArrow,'[');
@@ -304,12 +301,12 @@ NNx:
 
 tArrow: 
 	scan_blanks(fp);
-	eq_arrow = FALSE;
+	eq_arrow = false;
 	TCO(tEq,'-');
 	goto tGr;
 tEq: 
 	TCO(nArrow,'=');
-	eq_arrow = TRUE;
+	eq_arrow = true;
 tGr:
 	TCO(nArrow,'>');
 	printf("Arrow\n");
@@ -328,13 +325,13 @@ tGr:
 
 	cnxt_hold = cnxt_new;
 	if (IIPlen != -1) {
-		strcpy_s(cnxt_hold->upstream_name, "!");
+		strcpy(cnxt_hold->upstream_name, "!");
 		cnxt_hold->upstream_port_name[0] = '\0';
 		cnxt_hold->gen.IIPptr = IIP_ptr;
 	}
 	else {
-		strcpy_s(cnxt_hold -> upstream_name, upstream_name);
-		strcpy_s(cnxt_hold -> upstream_port_name, upstream_port_name);
+		strcpy(cnxt_hold -> upstream_name, upstream_name);
+		strcpy(cnxt_hold -> upstream_port_name, upstream_port_name);
 
 		cnxt_hold -> upstream_elem_no = upstream_elem_no;
 	}
@@ -362,7 +359,7 @@ ncap:
 	o_ptr = out_str;
 	TC(Y2a,'*');       /* automatic port */
 	*o_ptr = '\0';
-	strcpy_s(cnxt_hold->downstream_port_name, out_str);  /* ext. conn */
+	strcpy(cnxt_hold->downstream_port_name, out_str);  /* ext. conn */
 	goto is_outport;
 Y2a: 
 	if (scan_sym(fp,  out_str) != 0) {
@@ -372,7 +369,7 @@ Y2a:
 		ret_code = 4;
 		goto exit;  
 	}
-	strcpy_s(cnxt_hold->downstream_port_name, out_str);
+	strcpy(cnxt_hold->downstream_port_name, out_str);
 
 is_outport:
 
@@ -426,19 +423,19 @@ exit:
 		char down[200];
 		char elem[20];
 		if (cnxt_hold -> upstream_name[0] != '!') {
-			strcpy_s(up, cnxt_hold -> upstream_port_name);
+			strcpy(up, cnxt_hold -> upstream_port_name);
 			if (up[0] != '*') {
-				strcat_s(up, "[");				
-				_itoa_s(cnxt_hold -> upstream_elem_no, elem, 10);
-				strcat_s(up, elem);
-				strcat_s(up, "]");
+				strcat(up, "[");				
+				sprintf(elem, "%d", cnxt_hold -> upstream_elem_no);
+				strcat(up, elem);
+				strcat(up, "]");
 			}
-			strcpy_s(down, cnxt_hold -> downstream_port_name);
+			strcpy(down, cnxt_hold -> downstream_port_name);
 			if (down[0] != '*') {
-				strcat_s(down, "[");
-				_itoa_s(cnxt_hold -> downstream_elem_no, elem, 10);
-				strcat_s(down, elem);
-				strcat_s(down, "]");
+				strcat(down, "[");
+				sprintf(elem, "%d", cnxt_hold -> downstream_elem_no);
+				strcat(down, elem);
+				strcat(down, "]");
 			}
 			printf(" Connection: %s %s -> %s %s\n",
 			cnxt_hold -> upstream_name,
@@ -447,12 +444,12 @@ exit:
 			cnxt_hold -> downstream_name);
 		}
 		else {
-			strcpy_s(down, cnxt_hold -> downstream_port_name);
+			strcpy(down, cnxt_hold -> downstream_port_name);
 			if (down[0] != '*') {
-				strcat_s(down, "[");
-				_itoa_s(cnxt_hold -> downstream_elem_no, elem, 10);
-				strcat_s(down, elem);
-				strcat_s(down, "]");
+				strcat(down, "[");
+				sprintf(elem, "%d", cnxt_hold -> downstream_elem_no);
+				strcat(down, elem);
+				strcat(down, "]");
 			}
 			printf(" IIP: -> %s %s\n",
 				down,
@@ -597,7 +594,7 @@ proc_ent * find_or_build_proc(char * name) {
 		this_proc-> succ = 0;
 		this_proc-> composite = 0;
 		this_proc-> faddr = 0;
-		strcpy_s(this_proc->proc_name, name);
+		strcpy(this_proc->proc_name, name);
 		this_proc->trace = 0;
 		this_proc->comp_name[0] = '\0';
 	}

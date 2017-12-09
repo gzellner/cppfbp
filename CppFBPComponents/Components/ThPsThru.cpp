@@ -1,5 +1,3 @@
-
-#include "StdAfx.h"
 #include "compsvcs.h"
 #include <string.h>
 

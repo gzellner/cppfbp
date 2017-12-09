@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include <stdarg.h>
    #include <string.h>
    #include <stdio.h>
@@ -80,7 +79,7 @@
 
    va_start (ap, peptr);
    for (i = 0; i < port_count; i++) {
-	strcpy_s((peptr+i) -> port_name, va_arg(ap, char *));
+	strcpy((peptr+i) -> port_name, va_arg(ap, char *));
 	//(peptr+i) -> reserved = 0;
 	(peptr+i) -> elem_count = 0;
 	(peptr+i) -> ret_code = 0;

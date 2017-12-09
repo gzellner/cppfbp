@@ -1,6 +1,3 @@
-//#pragma comment(lib, "CppFBPCore")
-#include "StdAfx.h"
-
 /* THSORT is a simple Sort.
 
 CALLING THSORT:   

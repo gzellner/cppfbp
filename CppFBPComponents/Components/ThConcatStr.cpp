@@ -1,6 +1,3 @@
-
-#include "StdAfx.h"
-
 #include "compsvcs.h"
 
 // This component receives all IPs from input port element 0, then from element 1, then from 2, and so forth...

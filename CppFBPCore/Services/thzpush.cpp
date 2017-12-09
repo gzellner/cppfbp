@@ -1,6 +1,4 @@
-//#include <setjmp.h>
 #include <stdio.h>
-//#include <malloc.h>
 #include <string.h>
 #include "thzcbs.h"
 #include "cppfbp.h"
@@ -31,7 +29,7 @@ int thzpush(Process *pptr, void **ptr)
   //   qptr -> prev_IP = optr;
    IPptr -> next_IP = pptr -> stack;
    pptr -> stack = IPptr;
-   IPptr -> on_stack = TRUE;
+   IPptr -> on_stack = true;
    if (pptr -> trace) MSG1("%s Push end\n",pptr -> procname);
    *ptr = 0;
    pptr -> owned_IPs--;

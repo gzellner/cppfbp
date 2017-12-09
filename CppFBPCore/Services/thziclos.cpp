@@ -1,12 +1,8 @@
-//#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <malloc.h>
 #include <string.h>
 #include "thzcbs.h"
 #include "cppfbp.h"
-#define FALSE 0
-#define TRUE 1
 #define INPUT 0
 #define OUTPUT 1
 
@@ -30,7 +26,7 @@ void thziclos(Process *pptr, Port  * cpp, int elem_no)
 	//if (pptr->trace) MSG1("%s Close\n",pptr -> procname);
 
 	if (cpp -> elem_list[elem_no].is_IIP) {
-					cpp -> elem_list[elem_no].closed = TRUE;
+					cpp -> elem_list[elem_no].closed = true;
 					return;
 	}
 
@@ -49,7 +45,7 @@ void thziclos(Process *pptr, Port  * cpp, int elem_no)
 		}
 
 		cnp -> nonterm_upstream_proc_count = 0;
-		cnp -> closed = TRUE;
+		cnp -> closed = true;
 		//sptr = cnp -> procs_wtg_to_send;
 		//while (sptr != 0)   {
 			//cnp -> procs_wtg_to_send = sptr -> next_proc;
@@ -79,16 +75,16 @@ void thziclos(Process *pptr, Port  * cpp, int elem_no)
 		//Cnxt * cnp = cpp -> elem_list[elem_no].gen.connxn;
 		cnp -> nonterm_upstream_proc_count--;
 		sptr = cnp -> fed_proc;
-		//term_now = TRUE;
+		//term_now = true;
 		if (sptr -> begin_port != 0 &&
 			sptr -> begin_port -> elem_list[0].gen.connxn == cnp) {
 				cnp -> nonterm_upstream_proc_count = 0;
-				//term_now = FALSE;
+				//term_now = false;
 		}
 
 		if (cnp -> nonterm_upstream_proc_count == 0) {
 			
-			cnp -> closed = TRUE;
+			cnp -> closed = true;
 			if (sptr -> status == NOT_STARTED || sptr -> status == DORMANT)
 			sptr -> activate();
 			else 
@@ -96,7 +92,7 @@ void thziclos(Process *pptr, Port  * cpp, int elem_no)
 		}
 	}
 
-	cpp -> elem_list[elem_no].closed = TRUE;
+	cpp -> elem_list[elem_no].closed = true;
 	lock.unlock();
     lock.~unique_lock();
 	if (pptr->trace) MSG1("%s Close end\n", pptr -> procname);

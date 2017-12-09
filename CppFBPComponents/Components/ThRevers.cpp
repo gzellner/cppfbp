@@ -1,6 +1,3 @@
-//#pragma comment(lib, "CppFBPCore")
-
-#include "StdAfx.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -1,6 +1,5 @@
 //#pragma comment(lib, "CppFBPCore")
 
-#include "StdAfx.h"
 #include <string.h>
 #include "compsvcs.h"
 /* THFILEWT writes incoming entities to the file named on port OPT and
@@ -30,7 +29,7 @@ None
 		char fname[256];
 		int ch;
 		port_ent port_tab[3];
-		FILE *fp;
+		FILE *f;
 		//char buffer[256];
 
 
@@ -42,12 +41,7 @@ None
 		memcpy(fname, ptr, size);
 		value = dfsdrop(proc_anchor, &ptr);
 		fname[size] = '\0';
-#ifdef WIN32
-		errno_t err;
-		if ((err = fopen_s(&fp, fname, "w")) != 0) {
-#else
 		if ((f = fopen(fname, "w")) == NULL) {
-#endif
 			fprintf(stderr, "Cannot open file %s!\n", fname);
 			return(8);
 		}
@@ -58,15 +52,15 @@ None
 			dptr = (char *)ptr;
 			for (i = 0; i < size; i++) {
 				ch = (int)* (dptr + i);
-				value = fputc(ch, fp);
+				value = fputc(ch, f);
 			}
-			value = fputc('\n', fp);
+			value = fputc('\n', f);
 
 			value = dfssend(proc_anchor, &ptr, &port_tab[2], 0);
 			if (value == 2)
 				value = dfsdrop(proc_anchor, &ptr);
 			value = dfsrecv(proc_anchor, &ptr, &port_tab[1], 0, &size, &type);
 		}
-		fclose(fp);
+		fclose(f);
 		return(0);
 	}

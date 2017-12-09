@@ -1,11 +1,9 @@
 
-#include "StdAfx.h"
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-  #include "compsvcs.h"
+#include "compsvcs.h"
 
 
   THRCOMP ThGenIps(_anchor proc_anchor)
@@ -17,7 +15,7 @@
   long size, count;
   char *type;
   port_ent port_tab[3];
-  //char buffer[256];
+  char G[2] = "G";
 
   value = dfsdfpt(proc_anchor, 3, port_tab,"COUNT","OUT","PREFIX");
 
@@ -42,10 +40,10 @@
   }
  // dfstest(proc_anchor);
   for (i = 0; i < count; i++) {
-      value = dfscrep(proc_anchor, &ptr, 32,"G");
+      value = dfscrep(proc_anchor, &ptr, 32,G);
       strcpy((char *) ptr, string);
       p = strchr((char *) ptr, '\0');
-      _itoa(i, p, 10);
+      sprintf(p, "%d", i);
       value = dfssend(proc_anchor, &ptr, &port_tab[1], 0);
       }
   return(0);

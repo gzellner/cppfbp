@@ -1,9 +1,7 @@
-#include "StdAfx.h"
-
 extern "C" {
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include "../../CppFBPLua/src/lua.h"
+#include "../../CppFBPLua/src/lualib.h"
+#include "../../CppFBPLua/src/lauxlib.h"
 }
 #include "compsvcs.h"
 #include <string.h>

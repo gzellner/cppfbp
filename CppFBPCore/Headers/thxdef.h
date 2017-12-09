@@ -4,17 +4,9 @@
 external control blocks - used in network definitions
 */
  
-//#ifndef THXANCH
-//#define THXANCH
 #include "thxanch.h"
-//#endif
 
-
-//typedef int (__stdcall *LPFNDLLFUNC) (_anchor anch);
-typedef __declspec(dllimport) int (*LPFNDLLFUNC) (_anchor anch);
-//#define THRCOMP __declspec(dllexport) int __stdcall
-#define THRCOMP extern "C" __declspec(dllexport) int 
- 
+#define THRCOMP int 
 
 struct _IIP
    {
@@ -30,7 +22,7 @@ typedef  _IIP IIP;
      char comp_name[200];
 
      //int32_t (__stdcall *faddr) (_anchor anch);
-	 LPFNDLLFUNC faddr;
+	 int (*faddr)(_anchor anch);
 	 
      void *proc_block;   // used as a temporary placeholder by thxbnet
 	 void * label_ptr;   // points to a label for subnets	 

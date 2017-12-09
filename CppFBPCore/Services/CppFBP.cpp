@@ -6,12 +6,6 @@ between processes, connections, ports and IIPs - they will be referred to as fix
 
 */
 
-#include "stdafx.h"
-#include <dos.h>  
-#if defined _WIN32
-#include <windows.h>
-#endif
-
 #include <stdarg.h>
 
 #include "thxdef.h"

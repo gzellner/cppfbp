@@ -1,4 +1,4 @@
-//#include <setjmp.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -36,7 +36,7 @@ int thzcrep(Process *pptr, void **ptr, long IPsize, char *type)
    
    IPptr -> next_IP = 0;
    IPptr -> prev_IP = 0;
-   IPptr -> on_stack = FALSE;
+   IPptr -> on_stack = false;
    //pptr -> first_owned_IP = IPptr;
    tptr = (IP *) IPptr;
    *ptr = tptr -> datapart;

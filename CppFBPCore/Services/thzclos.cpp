@@ -1,12 +1,9 @@
-//#include <setjmp.h>
+
 #include <stdio.h>
 #include <stdlib.h>
-//#include <malloc.h>
 #include <string.h>
 #include "thzcbs.h"
 #include "cppfbp.h"
-#define FALSE 0
-#define TRUE 1
 #define INPUT 0
 #define OUTPUT 1
 
@@ -22,21 +19,21 @@ int thzclosc(Process *proc, char * port ){
 	port_ent pe;
 
 	if (p == 0) 
-		strcpy_s (port_name, port);
+		strcpy (port_name, port);
 	else {
 		q = strchr(p, ']');
 		auto n = q - p - 1;
 		char no[10];		
-		strncpy_s(no, p + 1, n);
+		strncpy(no, p + 1, n);
 		elem_no = atoi(no);
 		char * r = port;
-		strncpy_s (port_name, port, p - r);
+		strncpy (port_name, port, p - r);
 		port_name[p - r] = '\0';
 	}
 
 	//port_ent* pe = (port_ent *) malloc(sizeof(port_ent));   
 
-	strcpy_s(pe.port_name, port_name);
+	strcpy(pe.port_name, port_name);
 	Port * cpp = proc -> in_ports;
 	while (cpp != 0)
 	{
@@ -77,7 +74,7 @@ int thzclos(Process *proc, port_ent *peptr, int elem_no)
 	thziclos(proc, cpp, elem_no);
 
 	
-	cpp -> elem_list[elem_no].closed = TRUE;
+	cpp -> elem_list[elem_no].closed = true;
 
 	if (proc->trace) MSG1("%s Close end\n", proc -> procname);
 	return(0);

@@ -1,12 +1,7 @@
-
-//#include <setjmp.h>
 #include <stdio.h>
-//#include <malloc.h>
 #include <string.h>
 #include "thzcbs.h"
 #include "cppfbp.h"
-#define FALSE 0
-#define TRUE 1
 #define INPUT 0
 #define OUTPUT 1
 
@@ -25,21 +20,21 @@ int elem_no = 0;
 	port_ent pe;
 
 	if (p == 0) 
-		strcpy_s (port_name, port);
+		strcpy (port_name, port);
 	else {
 		q = strchr(p, ']');
 		auto n = q - p - 1;
 		char no[10];		
-		strncpy_s(no, p + 1, n);
+		strncpy(no, p + 1, n);
 		elem_no = atoi(no);
 		char * r = port;
-		strncpy_s (port_name, port, p - r);
+		strncpy (port_name, port, p - r);
 		port_name[p - r] = '\0';
 	}
 
 	//port_ent* pe = (port_ent *) malloc(sizeof(port_ent));   
 
-	strcpy_s(pe.port_name, port_name);
+	strcpy(pe.port_name, port_name);
 	Port * cpp = proc -> out_ports;
 	while (cpp != 0)
 	{
@@ -213,6 +208,6 @@ int thzsend(Process *proc, void **ptr, port_ent *peptr, int elem_no)
 retn:
 	//cnp->lock.unlock();
 	//cnp -> lock.~unique_lock();	
-	proc -> network -> active = TRUE;
+	proc -> network -> active = true;
 	return(value);
 }

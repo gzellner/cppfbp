@@ -1,16 +1,5 @@
 
-#include <dos.h>  
-#if defined _WIN32
-#include <windows.h>
-#endif
 #include <stdarg.h>
-
-//#ifdef _DEBUG
-//   #ifndef DBG_NEW
-//      #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-//      #define new DBG_NEW
-//   #endif
-//#endif  // _DEBUG
 
 #define MSG0(text)  {printf(text); \
 

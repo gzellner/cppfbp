@@ -1,11 +1,7 @@
-//#include <setjmp.h>
 #include <stdio.h>
-//#include <malloc.h>
 #include <string.h>
 #include "thzcbs.h"
 #include "cppfbp.h"
-#define FALSE 0
-#define TRUE 1
 
   int thzpop(Process *pptr, void **ptr, long *size, char **typep)
   {
@@ -39,7 +35,7 @@
    IPptr -> prev_IP = 0;
    //pptr -> first_owned_IP = IPptr;
    IPptr -> owner = pptr;
-   IPptr -> on_stack = FALSE;
+   IPptr -> on_stack = false;
    if (pptr -> trace) MSG1("%s Pop end\n", pptr -> procname);
    pptr -> owned_IPs++;
    return(0);
