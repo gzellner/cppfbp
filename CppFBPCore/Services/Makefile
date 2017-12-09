@@ -10,6 +10,8 @@ OBJS=$(SRCS:.cpp=.o)
 .PHONY: depend clean
 
 all: $(OBJS)
+
+.cpp.o:
 	$(CPP) $(CPPFLAGS) -c $< -o $@
 
 clean:

@@ -6,13 +6,16 @@ INCLUDES=-Y../../CppFBPCore/Headers
 SRCS=CopyFile.cpp
 PROG=copyfile
 
-OBJ=$(wildcard ../../CppFBPCore/Services/*.o) $(wildcard ../../CppFBPCore/intcomps/*.o) ../../CppFBPComponents/Components/ThFileRd.o ../../CppFBPComponents/Components/ThFileWt.o ../../CppFBPComponents/Components/ThCopyNL.o $(wildcard ../../CppFBPComponents/Helper_Code/*.o)
+OBJCPP=$(wildcard ../../CppFBPCore/Services/*.cpp) $(wildcard ../../CppFBPCore/intcomps/*.cpp) ../../CppFBPComponents/Components/ThFileRd.cpp ../../CppFBPComponents/Components/ThFileWt.cpp ../../CppFBPComponents/Components/ThCopyNL.cpp $(wildcard ../../CppFBPComponents/Helper_Code/*.cpp)
 
+OBJ=$(OBJCPP:.cpp=.o)
 OBJS=$(SRCS:.cpp=.o)
 
 .PHONY: depend clean
 
-copyfile: $(OBJ) $(OBJS)
+all: $(PROG)
+
+$(PROG): $(OBJ) $(OBJS)
 	$(CPP) $(CPPFLAGS) -o $(PROG) $(OBJS) $(OBJ) $(LIBS)
 
 .cpp.o:
