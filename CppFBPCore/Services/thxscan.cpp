@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <string.h>
 #include "cppfbp.h"
-#include "thzcbs.h"
 #include <stdlib.h>
 
 // #if __OS2__ == 1
@@ -105,8 +104,8 @@ int thxscan(FILE *fp, label_ent *label_tab, char file_name[10])
 	cnxt_tab = 0;	
 	label_curr = label_tab;
 
-	strcpy(label_curr->label," ");
-	strcpy(label_curr->file, file_name);
+	label_curr->label = " ";
+	label_curr->file = file_name;
 	label_curr->ent_type = 'L';
 
 	IIPlen = -1;
@@ -126,7 +125,7 @@ X0:
 	}
 	scan_blanks(fp);
 	TCO(X2,':');
-	strcpy(label_curr->label, out_str);  // it was a label		  
+	label_curr->label = out_str;  // it was a label		  
 	printf("Scanning Network: %s\n",out_str);
 
 bigloop:	
@@ -560,9 +559,9 @@ label_ent * find_label(label_ent *label_tab, char name[32], char file[10],  int 
 			continue;  
 		if (label_new -> ent_type != 'L') 
 			continue;  
-		if (strcmp(label_new->label, name) == 0  &&
-			(strcmp(label_new->file, "\0") == 0 ||
-			strcmp(label_new->file, file) == 0))
+		if ((label_new->label == name) &&
+		    (label_new->file == "") ||
+		    (label_new->file == file))
 			break;
 		label_new = label_new->succ;
 	}

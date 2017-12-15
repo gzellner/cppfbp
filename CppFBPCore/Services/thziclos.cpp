@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
 #define INPUT 0
 #define OUTPUT 1

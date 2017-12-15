@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdarg.h>
+
 struct _port_ent              // block representing port in process's
 	//   stack storage - this relates the
 	//   name used by the component code
@@ -20,7 +22,6 @@ struct _port_ent              // block representing port in process's
 
 typedef  _port_ent port_ent;
 
-#include <stdarg.h>
  struct  _anchor
     {
 

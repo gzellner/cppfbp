@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
 
 int thzpush(Process *pptr, void **ptr)

@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <cstdlib>
-#include "thzcbs.h"
+#include <string>
 #include "cppfbp.h"
 
 #include <boost/thread/condition.hpp>
@@ -50,15 +50,13 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
 
   Process * mother = (Process *) proc_anchor.reserved;
 
-  label_tab = (label_ent *)malloc(sizeof(label_ent));
+  label_tab = new label_ent();
   label_curr = label_tab;
   label_ent * label_this = label_blk;
   if (!dynam) {
     for (;;) {
-      strcpy(label_curr->label,
-	     label_this->label);
-      strcpy(label_curr->file,
-	     label_this->file);
+      label_curr->label = label_this->label;
+      label_curr->file = label_this->file;
       label_curr->cnxt_ptr = 
 	label_this->cnxt_ptr;
       label_curr->proc_ptr = 
@@ -66,8 +64,10 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
       label_curr->ent_type = 
 	label_this->ent_type;
       label_this = label_this->succ;
-      if (label_this == 0) break;
-      label_new = (label_ent *)malloc(sizeof(label_ent));  // handle subnets
+      if (label_this == nullptr){
+	break;
+      }
+      label_new = new label_ent();  // handle subnets
       label_curr->succ = label_new;
       label_curr = label_new;
     }
@@ -76,13 +76,9 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
     proc_tab = label_tab -> proc_ptr;
   }
   else {
-    label_tab->succ = 0;
+    label_tab->succ = nullptr;
     file_name[0] = '\0'; 
 
-    //if (fp == 0) {
-    //	printf("File does not exist: %s\n", fp);
-    //	exit(4);
-    //}
     if (thxscan(fp, label_tab, file_name) != 0) {
 
       printf("Scan error\n");
@@ -577,8 +573,8 @@ void Process::activate() {
       }
       //old_proc = this_proc;
       //this_proc = this_proc -> next_proc;
-      this_proc -> mtx.~mutex();
-      this_proc -> canGo.~condition_variable_any();
+      //      this_proc -> mtx.~mutex();
+      //this_proc -> canGo.~condition_variable_any();
       delete this_proc;
       this_proc = first_child_proc;
     }

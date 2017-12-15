@@ -7,7 +7,7 @@ SRCS=Network.cpp
 
 OBJS=$(SRCS:.cpp=.o)
 
-.PHONY: depend clean
+.PHONY: clean
 
 all: $(OBJS)
 
@@ -17,10 +17,3 @@ all: $(OBJS)
 clean:
 	rm -f *.o *~
 
-depend: $(SRCS)
-	makedepend $(INCLUDES) $^
-
-# DO NOT DELETE THIS LINE -- make depend depends on it.
-
-Network.o: ../Headers/thzcbs.h ../Headers/thxdef.h ../Headers/thxanch.h
-Network.o: ../Headers/cppfbp.h ../Headers/fbp.h

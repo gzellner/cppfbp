@@ -9,7 +9,7 @@ between processes, connections, ports and IIPs - they will be referred to as fix
 #include <stdarg.h>
 
 #include "thxdef.h"
-#include "thzcbs.h"
+#include "cppfbp.h"
 
 
 	void   CppFBP(label_ent * label_blk, bool dynam, FILE * fp, bool timereq) {

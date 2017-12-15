@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
 
   int thzpop(Process *pptr, void **ptr, long *size, char **typep)

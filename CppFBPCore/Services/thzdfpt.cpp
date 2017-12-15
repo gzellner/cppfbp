@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
 
 int thzdfpt(Process *pptr, int port_count, port_ent *peptr)

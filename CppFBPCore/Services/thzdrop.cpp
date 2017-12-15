@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
 
 int thzdrop(Process *proc, void **ptr)

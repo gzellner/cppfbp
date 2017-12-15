@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
     
 #define TC(label,ch)  if (curr_char != ch) goto label;	\

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "thzcbs.h"
 #include "cppfbp.h"
 #define INPUT 0
 #define OUTPUT 1

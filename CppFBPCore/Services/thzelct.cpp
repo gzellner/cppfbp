@@ -1,4 +1,3 @@
-#include "thzcbs.h"
 #include "cppfbp.h"
 
 int thzelctc(Process *proc, char * port)
