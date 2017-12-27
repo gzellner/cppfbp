@@ -1,12 +1,14 @@
 
 #pragma once
 
+#include <string>
+
 class Network;
 class Process {             // process control block
   //--------------------------------------
  public:
-  char procname[128];         // process name
-  char compname[200];         // component name
+  std::string procname;         // process name
+  std::string compname;         // component name
   //Process *next_proc;   // ptr to next process in chain
   //       of ready processes (dynamic)
   //jmp_buf state;             // state of component - used by longjmp
@@ -25,7 +27,7 @@ class Process {             // process control block
   Port *end_port;        // ptr to 'ending' port - if specified,
   //   process sends a signal to this port
   //   when it finally terminates  
-  struct _port_ent int_pe;   // 'port_ent' block internal to process
+  port_ent int_pe;   // 'port_ent' block internal to process
   //    control block  - allows 'ending' port
   //    logic to use THZSEND
   void *int_ptr;             // holds ptr to IP created by 'ending'
@@ -36,11 +38,11 @@ class Process {             // process control block
   //int ( __stdcall *faddr) (_anchor anch);   // address of code to be
   //     executed by this process
 	
-  int (*faddr)(_anchor anch);     // address of code to be
+  int (*faddr)(anchor anch);     // address of code to be
   //     executed by this process
 
-  _anchor proc_anchor;  // anchor to be passed to service calls
-  struct _IPh   *stack;   //  ptr to first IP in process stack -
+  anchor proc_anchor;  // anchor to be passed to service calls
+  IPh   *stack;   //  ptr to first IP in process stack -
   //     managed by THZPUSH and THZPOP
   char status;               //  status of process execution:
   //     values defined in #defines below
@@ -60,6 +62,7 @@ class Process {             // process control block
   void dormwait();
   int run_test();
 
+  bool readyToGo;
   boost::thread thread;   
   boost::condition canGo;
   boost::mutex mtx;
@@ -77,7 +80,7 @@ class Process {             // process control block
 #define TERMINATED            'T'    // terminated
 
 
- Process() : faddr(nullptr) {
+ Process() : faddr(nullptr), readyToGo(false) {
     Process::status = NOT_STARTED ;		
   }
 

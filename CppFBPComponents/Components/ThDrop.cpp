@@ -16,12 +16,12 @@
 
 
 
-  THRCOMP  ThDrop(_anchor proc_anchor)
+  THRCOMP  ThDrop(anchor proc_anchor)
 {
   void *ptr;
   int value;
   long size;
-  char *type;
+  std::string type;
   port_ent port_tab[1];
 
   value = dfsdfpt(proc_anchor, 1, port_tab,"IN");

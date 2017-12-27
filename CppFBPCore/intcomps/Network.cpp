@@ -8,10 +8,6 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/thread.hpp>
 
-#include <boost/ptr_container/ptr_list.hpp>
-
-//#define FILE struct _iobuf
-
 
 void disp_IP(IPh   * this_IP);
 /* first param of thxbnet is subnet address; last is whole net address */
@@ -33,7 +29,7 @@ void thziclos(Process * proc, Port * cpp, int i);
 bool deadlock_test_sw = true;
 
 
-void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anchor proc_anchor) {	
+void Network::go(label_ent *label_blk, bool dynamic, FILE *fp, bool timereq, anchor proc_anchor) {	
   Process *this_proc;
   cnxt_ent *cnxt_tab;
   proc_ent *proc_tab;
@@ -44,16 +40,16 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   char file_name[10];
 
   Port *cpp;
-  time_t st_time, end_time;
-  double secs;
-  st_time = time(NULL);
+  clock_t st_time, end_time;
+  float diff;
+  st_time = clock();
 
   Process * mother = (Process *) proc_anchor.reserved;
 
   label_tab = new label_ent();
   label_curr = label_tab;
   label_ent * label_this = label_blk;
-  if (!dynam) {
+  if (!dynamic) {
     for (;;) {
       label_curr->label = label_this->label;
       label_curr->file = label_this->file;
@@ -88,14 +84,14 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   //network = new Appl;
   //network = this;
   if (proc_anchor.reserved == NULL)
-    strcpy(name,"APPL");
+    name = "APPL";
   else
-    strcpy(name,"SUBNET");
+    name = "SUBNET";
   //first_ready_proc = 0;
-  first_child_proc = 0;
-  first_child_comp = 0;
-  first_cnxt = 0;
-  dynam = dynam;
+  first_child_proc = nullptr;
+  first_child_comp = nullptr;
+  first_cnxt = nullptr;
+  dynam = dynamic;
   active = false;
   possibleDeadlock = false;
   deadlock = false;
@@ -105,7 +101,7 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   int thread_count = 0;
 
   this_proc = (Process*) first_child_proc;
-  while (this_proc != 0)
+  while (this_proc != nullptr)
     {
       thread_count ++;
       this_proc = this_proc -> next_proc;
@@ -116,35 +112,34 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   latch =  new Cdl(thread_count);
 
   Cnxt * cnxt_ptr = (Cnxt *) first_cnxt;
-  while (cnxt_ptr != 0) {	 
+  while (cnxt_ptr != nullptr) {	 
     cnxt_ptr -> closed = false;
     cnxt_ptr = cnxt_ptr -> succ;
   }
 
   this_proc = (Process*) first_child_proc;
-  while (this_proc != 0)
+  while (this_proc != nullptr)
     {
       this_proc -> network = this;
       this_proc-> self_starting = true;
       cpp = this_proc -> in_ports;
-      while (cpp != 0) {	 
+      while (cpp != nullptr) {	 
 	for (int i = 0; i < cpp -> elem_count; i++) {
-	  if (cpp -> elem_list[i].gen.connxn != 0 &&
+	  if (cpp -> elem_list[i].gen.connxn != nullptr &&
 	      ! cpp -> elem_list[i].is_IIP)
 	    this_proc->self_starting = false;
 	}
 	cpp = cpp -> succ;
       }
-      if (this_proc -> self_starting)
-	{
-	  // add to ready chain
-	  //this_proc -> status = INITIATED;
-
-	  if (this_proc -> trace)
-	    printf("%s Initiated\n",this_proc -> procname);
-
-	  this_proc -> activate();
-	}
+      if (this_proc -> self_starting){
+	// add to ready chain
+	//this_proc -> status = INITIATED;
+	
+	if (this_proc -> trace){
+	  printf("%s Initiated\n",this_proc -> procname.c_str());
+	}	
+	this_proc -> activate();
+      }
       //thread_count ++;
       this_proc = this_proc -> next_proc;
     }
@@ -155,7 +150,7 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   delete latch;
 
 
-  //if (dynam) {                  -- check this out!
+  //if (dynamic) {                  -- check this out!
   //	free(cnxt_tab);
   //	free(proc_tab);		
   //}
@@ -165,13 +160,13 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   thxfcbs();
   //free(label_tab);
 
-  end_time = time(NULL);
-  secs = difftime(end_time, st_time);
+  end_time = clock();
+  diff = (float)end_time - (float)st_time;
   if (timereq){
-    printf("Elapsed time in seconds: %5.3f\n",secs);
+    printf("Elapsed time in seconds: %5.3f\n",diff/CLOCKS_PER_SEC);
   }
 
-  if (strcmp(name, "SUBNET") != 0) {
+  if (name != "SUBNET") {
     //_CrtDumpMemoryLeaks();
     //char c; 
     printf("Press enter to terminate\n");
@@ -181,13 +176,10 @@ void Network::go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anch
   }
 }
 
-
-Cdl::Cdl(int ct)  {
-  count = ct;
-}
+Cdl::Cdl(int ct) : count(ct) {}
 
 void Network::waitForAll() {
-  //boost::chrono::milliseconds msec(500);
+  //std::chrono::milliseconds msec(500);
 	
 
   for (;;) {
@@ -227,7 +219,7 @@ int Cdl::wait()
 /// @note count must be greater than 0 or undefined behavior
 void Cdl::count_down()
 {
-  //boost::lock_guard<boost::mutex> lock(mutex);
+  //std::lock_guard<std::mutex> lock(mutex);
   boost::unique_lock<boost::mutex> lock(mutex );
   assert( count );
   if ( --count == 0 )
@@ -243,177 +235,182 @@ void Process::activate() {
 
   if (status == NOT_STARTED) {
     status = ACTIVE;
-    //printf("Activate %s", compname);
+    //    printf("Activate %s", compname);
     if (faddr == nullptr) {
       printf("faddr == nullptr!\n");
       exit(1);
     }
-    else if (status == DORMANT) {		
-      canGo.notify_all();			
-    }
     boost::thread thread(&Process::run, this);  
+  }else if (status == DORMANT) {
+    //boost::unique_lock<boost::mutex> lock (mtx);
+      //      readyToGo = true;
+      canGo.notify_all();			
   }
 }
 
-  void Process::run() {
+void Process::run() {
 
-    //proc -> status = ACTIVE;
+  //proc -> status = ACTIVE;
 
-    /*
-      run_test() returns 0 if data waiting
-      1 if no data waiting, but not all upstream connections are closed
-      2 if no input ports or input ports are only IIP ports or all input ports closed
-    */
+  /*
+    run_test() returns 0 if data waiting
+    1 if no data waiting, but not all upstream connections are closed
+    2 if no input ports or input ports are only IIP ports or all input ports closed
+  */
 
-    for( ; ; ) {
-      if (2 == run_test()  && ! must_run && ! self_starting) 
-	break;
-      Port * cpp = in_ports;
-      while (cpp != 0) {	       
+  for( ; ; ) {
+    if (2 == run_test()  && ! must_run && ! self_starting) 
+      break;
+    Port * cpp = in_ports;
+    while (cpp != nullptr) {	       
+      for (int i = 0; i < cpp -> elem_count; i++) {
+	if (cpp -> elem_list[i].gen.connxn == nullptr)
+	  continue;
+	if (! cpp -> elem_list[i].is_IIP)
+	  cpp -> elem_list[i].closed = false;	
+      }
+      cpp = cpp -> succ;
+    }
+    //
+    // execute component code!
+    //
+    value = faddr (proc_anchor);	
+    //
+    // component code returns
+    //
+
+    if (value > 0)
+      printf ("Process %s returned with value %d\n",
+	      procname.c_str(), value); 
+    if (owned_IPs > 0)
+      printf("%s Deactivated with %ld IPs not disposed of\n",
+	     procname.c_str(), owned_IPs);
+
+    cpp = in_ports;
+    while (cpp != nullptr)
+      {
 	for (int i = 0; i < cpp -> elem_count; i++) {
-	  if (cpp -> elem_list[i].gen.connxn == 0)
+	  Cnxt * cnp = cpp -> elem_list[i].gen.connxn;
+	  if (cnp == nullptr)
 	    continue;
-	  if (! cpp -> elem_list[i].is_IIP)
-	    cpp -> elem_list[i].closed = false;	
+	  if (cpp -> elem_list[i].is_IIP) 
+	    cpp -> elem_list[i].closed = true;	
 	}
 	cpp = cpp -> succ;
       }
-      //
-      // execute component code!
-      //
-      value =
-	faddr (proc_anchor);	
-      //
-      // component code returns
-      //
+    if (trace)
+      printf("%s Deactivated with retcode %d\n",
+	     procname.c_str(), value);
 
-      if (value > 0)
-	printf ("Process %s returned with value %d\n",
-		procname, value); 
-      if (owned_IPs > 0)
-	printf("%s Deactivated with %ld IPs not disposed of\n",
-	       procname, owned_IPs);
-
-      cpp = in_ports;
-      while (cpp != 0)
-	{
-	  for (int i = 0; i < cpp -> elem_count; i++) {
-	    Cnxt * cnp = cpp -> elem_list[i].gen.connxn;
-	    if (cnp == 0)
-	      continue;
-	    if (cpp -> elem_list[i].is_IIP) 
-	      cpp -> elem_list[i].closed = true;	
-	  }
-	  cpp = cpp -> succ;
-	}
-      if (trace)
-	printf("%s Deactivated with retcode %d\n",
-	       procname, value);
-
-      if (value > 4) {
-	//proc -> terminating = true;
-	break;
-      }
-
-      int res;
-      /* res =  0 if data in cnxt; 1 if upstream not closed;
-	 2 if upstream closed */
-
-      res = run_test();
-
-      if (res == 2) break;
-      if (res == 0) continue;
-
-      dormwait();
+    if (value > 4) {
+      //proc -> terminating = true;
+      break;
     }
 
+    int res;
+    /* res =  0 if data in cnxt; 1 if upstream not closed;
+       2 if upstream closed */
 
+    res = run_test();
 
-    /*
-      Process * lpProc;
-      // This should only be done at termination time!
-      if (lpProc -> end_port != 0) {
-      lpProc -> value = thzcrep(lpProc,
-      &lpProc -> int_ptr, 0, "\0");
-      lpProc -> int_pe.cpptr = lpProc -> end_port;
-      lpProc -> value = thzsend(lpProc,
-      &lpProc -> int_ptr, &lpProc -> int_pe, 0);
-      if (lpProc -> value > 0)
-      lpProc -> value = thzdrop(lpProc,
-      &lpProc -> int_ptr);
-      //break;
-      }
+    if (res == 2) break;
+    if (res == 0) continue;
 
-    */
-    //close_outputPorts(proc);
-
-
-    Port * cpp = out_ports;
-    while (cpp != 0)
-      {
-	for (int i = 0; i < cpp -> elem_count; i++) {
-	  if (cpp -> elem_list[i].gen.connxn == 0)
-	    continue;
-	  /*value = */ thziclos(this, cpp, i);
-	}
-	cpp = cpp -> succ;
-      }
-
-    //close_inputPorts(proc);
-    cpp = in_ports;
-    while (cpp != 0)
-      {
-	for (int i = 0; i < cpp -> elem_count; i++) {
-	  if (cpp -> elem_list[i].gen.connxn == 0)
-	    continue;
-	  if (! cpp -> elem_list[i].is_IIP)
-	    thziclos(this, cpp, i);
-	}
-	cpp = cpp -> succ;
-      }
-    //printf("Terminated %s\n", proc -> procname);
-    status = TERMINATED;
-    if (trace)
-      printf("%s Terminated with retcode %d\n",
-	     procname, value);
-    //proc -> thread.join();
-    network -> latch -> count_down();
-  } 
-
-  void inline Process::dormwait() {
-    boost::unique_lock<boost::mutex> lock (mtx);
-    status = DORMANT;
-    canGo.wait(lock);
-    status = ACTIVE;
-
+    printf("%s value = %d\n", procname.c_str(), value);
+    dormwait();
   }
 
-  int Process::run_test() {
 
-    /*  
-	returns 0 if data waiting
-	1 if no data waiting, but not all upstream connections are closed
-	2 if no input ports or input ports are only IIP ports or all input ports closed
-    */
-    int res  = 2;
-    Cnxt * cnp;
-    Port * cpp = in_ports;
-    while (cpp != 0)
-      {
-	for (int i = 0; i < cpp -> elem_count; i++) {
-	  cnp = cpp -> elem_list[i].gen.connxn;
 
-	  if (cnp == 0)
-	    continue;
-	  if (cpp -> elem_list[i].is_IIP) {
-	    cpp -> elem_list[i].closed = false;
-	    continue;
-	  }
+  /*
+    Process * lpProc;
+    // This should only be done at termination time!
+    if (lpProc -> end_port != 0) {
+    lpProc -> value = thzcrep(lpProc,
+    &lpProc -> int_ptr, 0, "\0");
+    lpProc -> int_pe.cpptr = lpProc -> end_port;
+    lpProc -> value = thzsend(lpProc,
+    &lpProc -> int_ptr, &lpProc -> int_pe, 0);
+    if (lpProc -> value > 0)
+    lpProc -> value = thzdrop(lpProc,
+    &lpProc -> int_ptr);
+    //break;
+    }
+
+  */
+  //close_outputPorts(proc);
+
+
+  Port * cpp = out_ports;
+  while (cpp != nullptr)
+    {
+      for (int i = 0; i < cpp -> elem_count; i++) {
+	if (cpp -> elem_list[i].gen.connxn == nullptr)
+	  continue;
+	/*value = */ thziclos(this, cpp, i);
+      }
+      cpp = cpp -> succ;
+    }
+
+  //close_inputPorts(proc);
+  cpp = in_ports;
+  while (cpp != nullptr)
+    {
+      for (int i = 0; i < cpp -> elem_count; i++) {
+	if (cpp -> elem_list[i].gen.connxn == nullptr)
+	  continue;
+	if (! cpp -> elem_list[i].is_IIP)
+	  thziclos(this, cpp, i);
+      }
+      cpp = cpp -> succ;
+    }
+  //printf("Terminated %s\n", proc -> procname);
+  status = TERMINATED;
+  if (trace)
+    printf("%s Terminated with retcode %d\n",
+	   procname.c_str(), value);
+  //proc -> thread.join();
+  network -> latch -> count_down();
+} 
+
+void inline Process::dormwait() {
+  boost::unique_lock<boost::mutex> lock (mtx);
+  //readyToGo = false;
+  status = DORMANT;
+  //  while(!readyToGo){
+    canGo.wait(lock);
+    // }
+  status = ACTIVE;
+
+}
+
+int Process::run_test() {
+
+  /*  
+      returns 0 if data waiting
+      1 if no data waiting, but not all upstream connections are closed
+      2 if no input ports or input ports are only IIP ports or all input ports closed
+  */
+  int res  = 2;
+  Cnxt * cnp;
+  Port * cpp = in_ports;
+  while (cpp != nullptr)
+    {
+      for (int i = 0; i < cpp -> elem_count; i++) {
+	cnp = cpp -> elem_list[i].gen.connxn;
+
+	if (cnp == nullptr)
+	  continue;
+	if (cpp -> elem_list[i].is_IIP) {
+	  cpp -> elem_list[i].closed = false;
+	  continue;
+	}
+	{
 	  boost::unique_lock<boost::mutex>lock  (cnp ->mtx );
 	  if (cnp -> IPcount > 0){
 	    res  = 0;  // data in upstream connection
-	    lock.unlock();
-	    lock.~unique_lock();					
+	    // lock.unlock();
+	    // lock.~unique_lock();					
 	    break;
 	  }
 
@@ -421,195 +418,196 @@ void Process::activate() {
 	    cnp -> closed = true;                   
 	  else				
 	    res  = 1;    // no data in connection, but upstream processes not all closed!
-	  lock.unlock();
-	  lock.~unique_lock();
+  	  // lock.unlock();
+	  // lock.~unique_lock();
 	}
-	if (res == 0)
-	  break;
-	cpp = cpp -> succ;
       }
-    return res;
-  }
+      if (res == 0)
+	break;
+      cpp = cpp -> succ;
+    }
+  return res;
+}
 
-  bool Network::deadlock_test() {
+bool Network::deadlock_test() {
 
-    //testTimeouts(freq);
-    if (active) {
-      active = false; // reset flag every 1/2 sec
-    } else if (!possibleDeadlock) {
-      possibleDeadlock = true;
-    } else {
-      deadlock = true; // well, maybe
-      // so test state of components
+  //testTimeouts(freq);
+  if (active) {
+    active = false; // reset flag every 1/2 sec
+  } else if (!possibleDeadlock) {
+    possibleDeadlock = true;
+  } else {
+    deadlock = true; // well, maybe
+    // so test state of components
 
-      class ABC
+    class ABC
+    {
+    public:
+      char c [100];
+    };
+    std::list<ABC*> msgs;
+    std::list<ABC*>::iterator iterMsg;
+
+    ABC * s1 = new ABC;
+    strcpy (s1 ->c, "Network has deadlocked\n");
+    msgs.push_front(s1);  		// add in case msgs are printed
+
+
+    bool deadlock = true;
+    Process * this_proc = (Process *) first_child_proc;
+    //Cnxt * cnp;
+    bool terminated = true;
+    while (this_proc != nullptr)
       {
-      public:
-	char c [100];
-      };
-      boost::ptr_list<ABC> msgs;
-      boost::ptr_list<ABC>::iterator iterMsg;
+	char  status [30];
+	switch (this_proc -> status) {
+	case NOT_STARTED:				
+	  strcpy(status, "Not Started\n");
+	  terminated = false;
+	  break;
+	case ACTIVE:				
+	  strcpy(status, "Active\n");
+	  terminated = false;
+	  deadlock = false;
+	  break;
+	case DORMANT:				
+	  strcpy(status, "Inactive\n");
+	  terminated = false;
+	  break;
+	case SUSPENDED_ON_SEND:	
+	  terminated = false;
+	  strcpy(status, "Suspended on Send\n");
+	  //cnp = (Cnxt *) this_proc -> waiting_cnxt;
+	  //if (cnp -> IPcount < cnp ->max_IPcount) {
+	  //	cnp->buffer_not_full.notify_all();
+	  //	deadlock = false;
+	  //}
+	  break;
+	case SUSPENDED_ON_RECV:		
+	  terminated = false;
+	  strcpy(status, "Suspended on Receive\n");
+	  break;
+	  //case INITIATED:
+	  //	printf (" Process %s Initiated\n", this_proc -> procname);
+	  //	break;
+	  //case READY_TO_RESUME:
+	  //	printf (" Process %s Ready to Resume\n", this_proc -> procname);
+	  //	break;
+	case TERMINATED:				
+	  strcpy(status, "Terminated\n");
+	  break;
+	}
+	char msg[100];
+	strcpy (msg, "Process ");
+	strcat (msg, this_proc -> procname.c_str());
+	strcat (msg, " ");
+	strcat (msg, status);
+	ABC * s1 = new ABC;
+	strcpy(s1 -> c, msg);
+	msgs.push_front(s1); 
+	this_proc = this_proc -> next_proc;
+      }
 
-      ABC * s1 = new ABC;
-      strcpy (s1 ->c, "Network has deadlocked\n");
-      msgs.push_front(s1);  		// add in case msgs are printed
 
+    //if (listCompStatus(msgs)) { // if true, it is a deadlock
+    //          interruptAll();
+    if (deadlock && !terminated) {
 
-      bool deadlock = true;
-      Process * this_proc = (Process *) first_child_proc;
-      //Cnxt * cnp;
-      bool terminated = true;
-      while (this_proc != 0)
+      for (iterMsg = msgs.begin(); iterMsg != msgs.end(); iterMsg++)
 	{
-	  char  status [30];
-	  switch (this_proc -> status) {
-	  case NOT_STARTED:				
-	    strcpy(status, "Not Started\n");
-	    terminated = false;
-	    break;
-	  case ACTIVE:				
-	    strcpy(status, "Active\n");
-	    terminated = false;
-	    deadlock = false;
-	    break;
-	  case DORMANT:				
-	    strcpy(status, "Inactive\n");
-	    terminated = false;
-	    break;
-	  case SUSPENDED_ON_SEND:	
-	    terminated = false;
-	    strcpy(status, "Suspended on Send\n");
-	    //cnp = (Cnxt *) this_proc -> waiting_cnxt;
-	    //if (cnp -> IPcount < cnp ->max_IPcount) {
-	    //	cnp->buffer_not_full.notify_all();
-	    //	deadlock = false;
-	    //}
-	    break;
-	  case SUSPENDED_ON_RECV:		
-	    terminated = false;
-	    strcpy(status, "Suspended on Receive\n");
-	    break;
-	    //case INITIATED:
-	    //	printf (" Process %s Initiated\n", this_proc -> procname);
-	    //	break;
-	    //case READY_TO_RESUME:
-	    //	printf (" Process %s Ready to Resume\n", this_proc -> procname);
-	    //	break;
-	  case TERMINATED:				
-	    strcpy(status, "Terminated\n");
-	    break;
-	  }
-	  char msg[100];
-	  strcpy (msg, "Process ");
-	  strcat (msg, this_proc -> procname);
-	  strcat (msg, " ");
-	  strcat (msg, status);
-	  ABC * s1 = new ABC;
-	  strcpy(s1 -> c, msg);
-	  msgs.push_front(s1); 
+	  printf("%s", (*iterMsg)->c );
+	}
+
+      //char c; std::cin>>c;   // to see console
+
+      //		kill everything!
+      Process * this_proc = (Process *) first_child_proc;
+      boost::thread::id nat =  boost::this_thread::get_id();   // Not a Thread
+      while (this_proc != nullptr)
+	{
+	  boost::thread::id id = this_proc -> thread.get_id();
+	  if (nat != id)
+	    this_proc -> thread.interrupt();
 	  this_proc = this_proc -> next_proc;
 	}
-
-
-      //if (listCompStatus(msgs)) { // if true, it is a deadlock
-      //          interruptAll();
-      if (deadlock && !terminated) {
-
-	for (iterMsg = msgs.begin(); iterMsg != msgs.end(); iterMsg++)
-	  {
-	    printf("%s", iterMsg->c );
-	  }
-
-	//char c; std::cin>>c;   // to see console
-
-	//		kill everything!
-	Process * this_proc = (Process *) first_child_proc;
-	boost::thread::id nat =  boost::this_thread::get_id();   // Not a Thread
-	while (this_proc != 0)
-	  {
-	    boost::thread::id id = this_proc -> thread.get_id();
-	    if (nat != id)
-	      this_proc -> thread.interrupt();
-	    this_proc = this_proc -> next_proc;
-	  }
-	return true;
-      }
-      // one or more components haven't started or
-      // are in a long wait
-      deadlock = false;
-      possibleDeadlock = false;
-
+      return true;
     }
-    return false;
-  }
+    // one or more components haven't started or
+    // are in a long wait
+    deadlock = false;
+    possibleDeadlock = false;
 
-  void Network::thxfcbs()
-  {
-    Port *cpp, *oldPortp;
-    Process *this_proc;
-    Cnxt *this_cnxt;
+  }
+  return false;
+}
+
+void Network::thxfcbs()
+{
+  Port *cpp, *oldPortp;
+  Process *this_proc;
+  Cnxt *this_cnxt;
 
 	
+  this_proc = first_child_proc;
+  while (this_proc != nullptr) {
+    first_child_proc = this_proc -> next_proc;
+    cpp = this_proc -> out_ports;
+    while (cpp != nullptr) {
+      oldPortp = cpp;
+      cpp = cpp -> succ;
+      free(oldPortp);
+    }
+    cpp = this_proc -> in_ports;
+    while (cpp != nullptr) {
+      //for (i = 0; i < cpp -> elem_count; i++) {
+      //Cnxt * cnp = (Cnxt *) cpp -> elem_list[i].gen.connxn;
+      //if (cnp != 0) {						
+      //free(cnp);
+      //}
+      //}
+      oldPortp = cpp;
+      cpp = cpp -> succ;
+      free(oldPortp);
+    }
+    //old_proc = this_proc;
+    //this_proc = this_proc -> next_proc;
+    //      this_proc -> mtx.~mutex();
+    //this_proc -> canGo.~condition_variable_any();
+    delete this_proc;
     this_proc = first_child_proc;
-    while (this_proc != 0) {
-      first_child_proc = this_proc -> next_proc;
-      cpp = this_proc -> out_ports;
-      while (cpp != 0) {
-	oldPortp = cpp;
-	cpp = cpp -> succ;
-	free(oldPortp);
-      }
-      cpp = this_proc -> in_ports;
-      while (cpp != 0) {
-	//for (i = 0; i < cpp -> elem_count; i++) {
-	//Cnxt * cnp = (Cnxt *) cpp -> elem_list[i].gen.connxn;
-	//if (cnp != 0) {						
-	//free(cnp);
-	//}
-	//}
-	oldPortp = cpp;
-	cpp = cpp -> succ;
-	free(oldPortp);
-      }
-      //old_proc = this_proc;
-      //this_proc = this_proc -> next_proc;
-      //      this_proc -> mtx.~mutex();
-      //this_proc -> canGo.~condition_variable_any();
-      delete this_proc;
-      this_proc = first_child_proc;
-    }
-
-    this_cnxt = first_cnxt;
-    while (this_cnxt != 0) {
-      first_cnxt = this_cnxt -> succ;
-      delete this_cnxt;
-      this_cnxt = first_cnxt;
-    }
-
-    //if (!deadsw) {
-    //delete network;
-    //printf("Done\n");
-    //}
-  } 
- 
-  void disp_IP(IPh   * this_IP) {   // not currently used...
-    char * dptr;
-    IPh   * ip;
-    int i;
-    unsigned j;
-    long size;
-    char *type;
-
-    dptr = (char *) ((IP *) this_IP) -> datapart;
-    ip = this_IP;
-    size = ip -> IP_size;
-    type = ip -> type;
-    printf ("IP not disposed of - Length: %ld, Type: %s, Data:",
-	    size,  type);
-    for (i = 0; i < size; i++)  {
-      j = (int) *(dptr + i);
-      printf("%c",j);
-    }
-    printf("%c\n", (int) *(dptr + size));
   }
+
+  this_cnxt = first_cnxt;
+  while (this_cnxt != 0) {
+    first_cnxt = this_cnxt -> succ;
+    delete this_cnxt;
+    this_cnxt = first_cnxt;
+  }
+
+  //if (!deadsw) {
+  //delete network;
+  //printf("Done\n");
+  //}
+} 
+ 
+void disp_IP(IPh   * this_IP) {   // not currently used...
+  char * dptr;
+  IPh   * ip;
+  int i;
+  unsigned j;
+  long size;
+  std::string type;
+
+  dptr = (char *) ((IP *) this_IP) -> datapart;
+  ip = this_IP;
+  size = ip -> IP_size;
+  type = ip -> type->c_str();
+  printf ("IP not disposed of - Length: %ld, Type: %s, Data:",
+	  size,  type.c_str());
+  for (i = 0; i < size; i++)  {
+    j = (int) *(dptr + i);
+    printf("%c",j);
+  }
+  printf("%c\n", (int) *(dptr + size));
+}
  

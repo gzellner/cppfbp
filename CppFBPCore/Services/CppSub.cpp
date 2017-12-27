@@ -4,8 +4,8 @@
 #include "cppfbp.h"
 
 
-void   CppSub(label_ent * label_blk, bool dynam, FILE * fp, bool timereq, _anchor proc_anchor) {
-  _anchor anch;
+void   CppSub(label_ent * label_blk, bool dynam, FILE * fp, bool timereq, anchor proc_anchor) {
+  anchor anch;
   
   Network * subnet = new Network;
   Process * mother = (Process *)proc_anchor.reserved;

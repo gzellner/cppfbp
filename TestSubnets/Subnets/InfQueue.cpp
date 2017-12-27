@@ -1,16 +1,6 @@
-
-#include "StdAfx.h"
-
-#pragma comment(lib, "CppFBPCore")
-
-
-#pragma comment(lib, "CppFBPComponents")
-
-
-
 #include "thxdef.h"
 #include <stdio.h>
-#define FILE struct _iobuf
+//#define FILE struct _iobuf
 
 void  CppSub(label_ent * label_blk, bool dynam,  FILE * fp, bool timereq, _anchor proc_anchor);
 
@@ -32,7 +22,7 @@ proc_ent P3 = {&P2, "SubOut", "SubOut", SubOut, 0, 0, !TRACE, 0};
 IIP I0 = {"IN"};
 cnxt_ent C0 = {0, "!", " ", 0, "SubIn", "NAME", 0, &I0, 0};
 cnxt_ent C1 = {&C0, "SubIn", "OUT", 0, "Ecrire", "IN", 0, 0, 6};
-IIP I1 = {"c:\\temp\\infqueue.dat"};
+IIP I1 = {"/home/gerald/Temp/lala.dat"};
 cnxt_ent C2 = {&C1, "!", " ", 0, "Ecrire", "OPT", 0, &I1, 0};
 
 cnxt_ent C3 = {&C2, "Ecrire", "*", 0, "Lire", "*", 0, 0, 6};

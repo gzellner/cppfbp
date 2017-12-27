@@ -1,16 +1,18 @@
 
 #pragma once
 
+#include <string>
+
 class Process;
 class Cnxt {                // control block for a connection
   //--------------------------------------  
  public:
-  char name[128];             // name
+  std::string name;             // name
   Process *fed_proc;         // ptr to process 'fed' by this connection
   //  (can only be one) 
 	
-  struct _IPh   *first_IPptr;  // ptr to first IP in connection 
-  struct _IPh   *last_IPptr;   // ptr to last IP in connection
+  IPh   *first_IPptr;  // ptr to first IP in connection 
+  IPh   *last_IPptr;   // ptr to last IP in connection
   Cnxt *succ;        // successor connection block - used for cleanup
   long max_IPcount;          // maximum count of IPs allowed = capacity
   long IPcount;              // actual count of IPs in connection
@@ -24,7 +26,7 @@ class Cnxt {                // control block for a connection
 
 
   //private:
-  boost::condition buffer_not_full, buffer_not_empty;
+  boost::condition_variable buffer_not_full, buffer_not_empty;
   boost::mutex mtx;
 } ;
 

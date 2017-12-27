@@ -46,15 +46,14 @@ char curr_char;
 int scan_blanks(FILE *fp);
 int scan_sym(FILE *fp, char * out_str);
 
-label_ent * find_label(label_ent *label_tab, char name[32], char file[10],
-	int label_count);
-int thxgatrs(char * comp);
-proc_ent *find_or_build_proc(char * nm);
+label_ent * find_label(label_ent *label_tab, std::string &name, std::string &file, int label_count);
+int thxgatrs(std::string &comp);
+proc_ent *find_or_build_proc(std::string &nm);
 
 
 proc_ent *proc_tab;
 label_ent *label_curr;
-char comp_name[200];
+char comp_name[255];
 bool eof_found = false;
 char eol = '\n';
 
@@ -75,10 +74,10 @@ int thxscan(FILE *fp, label_ent *label_tab, char file_name[10])
 	//char fname[256];
 	char out_num[8];
 	size_t i, IIPlen, ret_code;
-	char upstream_name[255];	
-	char upstream_port_name[255];
+	std::string upstream_name;	
+	std::string upstream_port_name;
 	int upstream_elem_no;
-	char procname[255];	
+	std::string procname;	
 
 
 	proc_ent *proc_curr;
@@ -145,11 +144,11 @@ X1:
 		goto exit;  
 	}
 X2:
-	strcpy(procname, out_str);  
-	printf("Procname: %s\n", procname);
+	procname = out_str;  
+	std::cout << "Procname: " << procname << std::endl;
 	if (cnxt_hold != 0) {
-		strcpy(cnxt_hold -> downstream_name, procname);
-		cnxt_hold = 0;
+	  cnxt_hold -> downstream_name = procname;
+	  cnxt_hold = 0;
 	}
 
 	proc_curr = find_or_build_proc(procname);
@@ -213,13 +212,13 @@ NN2:
 	*o_ptr = '\0';
 
 	if (strlen(comp_name) > 0) {
-		strcpy(proc_curr -> comp_name, comp_name);
-		printf("Comp name: %s\n",comp_name); 
+	  proc_curr -> comp_name = comp_name;
+	  std::cout << "Comp name: " << comp_name << std::endl; 
 	}
 
 NB1: 
 	// comp scanned off, if any
-	strcpy(upstream_name, procname);	    // in case this proc is the upstream of another arrow
+	upstream_name = procname;	    // in case this proc is the upstream of another arrow
 	
 	scan_blanks(fp);
 
@@ -284,8 +283,8 @@ outport:
 GUy:
 	scan_blanks(fp);
 	
-	strcpy(upstream_port_name, out_str);
-	printf("Upstream port: %s\n", out_str);
+	upstream_port_name = out_str;
+	std::cout << "Upstream port: " << out_str << std::endl;
 	upstream_elem_no = 0;
 	TCO(tArrow,'[');
 	o_ptr = out_num;
@@ -324,13 +323,13 @@ tGr:
 
 	cnxt_hold = cnxt_new;
 	if (IIPlen != -1) {
-		strcpy(cnxt_hold->upstream_name, "!");
-		cnxt_hold->upstream_port_name[0] = '\0';
+		cnxt_hold->upstream_name = "!";
+		cnxt_hold->upstream_port_name = "";
 		cnxt_hold->gen.IIPptr = IIP_ptr;
 	}
 	else {
-		strcpy(cnxt_hold -> upstream_name, upstream_name);
-		strcpy(cnxt_hold -> upstream_port_name, upstream_port_name);
+		cnxt_hold -> upstream_name = upstream_name;
+		cnxt_hold -> upstream_port_name = upstream_port_name;
 
 		cnxt_hold -> upstream_elem_no = upstream_elem_no;
 	}
@@ -358,21 +357,21 @@ ncap:
 	o_ptr = out_str;
 	TC(Y2a,'*');       /* automatic port */
 	*o_ptr = '\0';
-	strcpy(cnxt_hold->downstream_port_name, out_str);  /* ext. conn */
+	cnxt_hold->downstream_port_name = out_str;  /* ext. conn */
 	goto is_outport;
 Y2a: 
 	if (scan_sym(fp,  out_str) != 0) {
-		printf("Downstream port name error for %s %s\n",
-			cnxt_hold->upstream_name,
-			cnxt_hold->upstream_port_name);
+	  std::cout << "Downstream port name error for " <<
+	    cnxt_hold->upstream_name << " " <<
+	    cnxt_hold->upstream_port_name << std::endl;
 		ret_code = 4;
 		goto exit;  
 	}
-	strcpy(cnxt_hold->downstream_port_name, out_str);
+	cnxt_hold->downstream_port_name =  out_str;
 
 is_outport:
 
-	printf("Downstream port: %s\n", cnxt_hold->downstream_port_name);
+	std::cout << "Downstream port: " << cnxt_hold->downstream_port_name << std::endl;
 
 	scan_blanks(fp);
 	TCO(X1,'[');
@@ -411,48 +410,41 @@ exit:
 	printf("\nSummary:\n");
 	proc_curr = proc_tab;
 	while (proc_curr != 0) {	
-		printf(" Process: %s (%s)\n",proc_curr -> proc_name,
-			proc_curr -> comp_name);
-		proc_curr = proc_curr -> succ;
+	  std::cout << " Process: " << proc_curr -> proc_name << "(" << proc_curr -> comp_name << ")" << std::endl;
+	  proc_curr = proc_curr -> succ;
 	}
 
 	cnxt_hold = cnxt_tab;
 	while (cnxt_hold != 0) {
-		char up[200];
-		char down[200];
-		char elem[20];
+	  std::string up;
+	  std::string down;
+	  std::string elem;
 		if (cnxt_hold -> upstream_name[0] != '!') {
-			strcpy(up, cnxt_hold -> upstream_port_name);
+			up = cnxt_hold -> upstream_port_name;
 			if (up[0] != '*') {
-				strcat(up, "[");				
-				sprintf(elem, "%d", cnxt_hold -> upstream_elem_no);
-				strcat(up, elem);
-				strcat(up, "]");
+				up += "[";				
+				elem = cnxt_hold -> upstream_elem_no;
+				up += elem;
+				up += "]";
 			}
-			strcpy(down, cnxt_hold -> downstream_port_name);
+			down = cnxt_hold -> downstream_port_name;
 			if (down[0] != '*') {
-				strcat(down, "[");
-				sprintf(elem, "%d", cnxt_hold -> downstream_elem_no);
-				strcat(down, elem);
-				strcat(down, "]");
+				down += "[";
+				elem = cnxt_hold -> downstream_elem_no;
+				down += elem;
+				down += "]";
 			}
-			printf(" Connection: %s %s -> %s %s\n",
-			cnxt_hold -> upstream_name,
-			up,			
-			down,
-			cnxt_hold -> downstream_name);
+			std::cout << " Connection: " << cnxt_hold -> upstream_name << " " << up << " -> " << down << " " << cnxt_hold -> downstream_name << std::endl;
 		}
 		else {
-			strcpy(down, cnxt_hold -> downstream_port_name);
+			down = cnxt_hold -> downstream_port_name;
 			if (down[0] != '*') {
-				strcat(down, "[");
-				sprintf(elem, "%d", cnxt_hold -> downstream_elem_no);
-				strcat(down, elem);
-				strcat(down, "]");
+				down += "[";
+				elem = cnxt_hold -> downstream_elem_no;
+				down += elem;
+				down += "]";
 			}
-			printf(" IIP: -> %s %s\n",
-				down,
-				cnxt_hold -> downstream_name);
+			std::cout << " IIP: -> " << down << " " << cnxt_hold -> downstream_name << std::endl;
 			IIP_ptr = cnxt_hold -> gen.IIPptr;
 			printf("    \'");
 			auto j = strlen(IIP_ptr -> datapart);
@@ -549,7 +541,7 @@ ES4:
 	return(0);
 }
 
-label_ent * find_label(label_ent *label_tab, char name[32], char file[10],  int label_count )
+label_ent * find_label(label_ent *label_tab, std::string &name, std::string &file,  int label_count )
 {
 	label_ent * label_new;
 	label_new = label_tab;
@@ -568,11 +560,11 @@ label_ent * find_label(label_ent *label_tab, char name[32], char file[10],  int 
 	return(label_new);
 }
 
-proc_ent * find_or_build_proc(char * name) {
+proc_ent * find_or_build_proc(std::string &name) {
 	proc_ent * this_proc = proc_tab;	   
 	proc_ent * last_proc = 0;
 	while (this_proc != 0) {			
-		if (strcmp(this_proc->proc_name, name) == 0) break;	
+		if (this_proc->proc_name == name) break;	
 		last_proc = this_proc;
 		this_proc = this_proc->succ;
 	}
@@ -593,9 +585,9 @@ proc_ent * find_or_build_proc(char * name) {
 		this_proc-> succ = 0;
 		this_proc-> composite = 0;
 		this_proc-> faddr = 0;
-		strcpy(this_proc->proc_name, name);
+		this_proc->proc_name = name;
 		this_proc->trace = 0;
-		this_proc->comp_name[0] = '\0';
+		this_proc->comp_name = "";
 	}
 	return this_proc;
 }

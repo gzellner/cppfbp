@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <string>
+
 /* 
    cp and cp_elem handle the connections between a port and its owning process -
    each cp block is followed by an array of cp element blocks, each of which points at a connection (Cnxt), an IIP or zero
@@ -28,7 +30,7 @@ class Port {          //  port control block (see above)
  public:
   Port *succ;  // next port in input port chain or output
   //  port chain - these are separate chains
-  char port_name[32];   // port name
+  std::string port_name;   // port name
 
   int elem_count;       //  count of elements in port 
   bool direction;   //  input/output port: TRUE = output

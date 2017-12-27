@@ -1,4 +1,8 @@
 #pragma once
+#include <condition_variable>
+#include <thread>
+#include <mutex>
+#include <list>
 #include <string>
 
 /* 
@@ -17,13 +21,13 @@ struct _IIP
 typedef  _IIP IIP;
 
 
-struct _proc_ent {
-  _proc_ent *succ;
-  char proc_name[32];
-  char comp_name[200];
+struct proc_ent {
+  proc_ent *succ;
+  std::string proc_name;
+  std::string comp_name;
 
   //int32_t (__stdcall *faddr) (_anchor anch);
-  int (*faddr)(_anchor anch);
+  int (*faddr)(anchor anch);
 	 
   void *proc_block;   // used as a temporary placeholder by thxbnet
   void * label_ptr;   // points to a label for subnets	 
@@ -32,34 +36,28 @@ struct _proc_ent {
   bool must_run;  // new - doesn't seem to hurt, even when CopyFile not modified!
 };
 
-typedef  _proc_ent proc_ent;
-
 class Cnxt;
-struct _cnxt_ent {
-  _cnxt_ent *succ;
-  char upstream_name[32];       /* if 1st char is !,        */
-  char upstream_port_name[32];     /* connxn points at IIP */
+struct cnxt_ent {
+  cnxt_ent *succ;
+  std::string upstream_name;       /* if 1st char is !,        */
+  std::string upstream_port_name;     /* connxn points at IIP */
   int upstream_elem_no;
-  char downstream_name[32];
-  char downstream_port_name[32];
+  std::string downstream_name;
+  std::string downstream_port_name;
   int downstream_elem_no;
   union cnxt_union {IIP * IIPptr; Cnxt *connxn;} gen;
   int capacity;
   bool dropOldest;     // new - doesn't seem to hurt, even when CopyFile not modified!
 };
 
-typedef  _cnxt_ent cnxt_ent;
-
-struct _label_ent {
-  _label_ent *succ;
+struct label_ent {
+  label_ent *succ;
   std::string label;
   std::string file;
-  _cnxt_ent *cnxt_ptr;
-  _proc_ent *proc_ptr;
+  cnxt_ent *cnxt_ptr;
+  proc_ent *proc_ptr;
   char ent_type;
 };
-
-typedef  _label_ent label_ent;
 
 #define THXDEF
 #define TRACE true

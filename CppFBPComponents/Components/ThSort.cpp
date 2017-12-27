@@ -16,13 +16,13 @@ None
 #include <string.h>
 #include "compsvcs.h"  
 
-THRCOMP ThSort (_anchor proc_anchor) {
+THRCOMP ThSort (anchor proc_anchor) {
 	void *ptr;	
 	void *dptrm, *dptr;
-	char * cptrm, *cptr;
+	//	char * cptrm, *cptr;
 	int value, i;
 	long size;
-	char *type;
+	std::string type;
 	port_ent port_tab[2];
 	void** sort_tab;
 	int count, lowest;
@@ -62,8 +62,8 @@ THRCOMP ThSort (_anchor proc_anchor) {
 					k = n;
 					if (n > m)
 						k = m;
-					cptrm = (char *) dptrm;
-					cptr = (char *) dptr;
+					//cptrm = (char *) dptrm;
+					//cptr = (char *) dptr;
 					if (memcmp(dptrm, dptr, k) > 0) {
 						dptrm = dptr;
 						lowest = i;

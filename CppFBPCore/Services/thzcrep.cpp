@@ -6,7 +6,7 @@
 
 
 
-int thzcrep(Process *pptr, void **ptr, long IPsize, char *type)
+int thzcrep(Process *pptr, void **ptr, long IPsize, std::string &type)
 {
 
 	/*  This service returns the data part of an IP - if info is needed from the header,
@@ -17,9 +17,9 @@ int thzcrep(Process *pptr, void **ptr, long IPsize, char *type)
   
    IP   *tptr;
    
-   if (pptr->trace) MSG1("%s Crep start\n", pptr -> procname);
+   MSG1(pptr->trace,"%s Crep start\n", pptr -> procname.c_str());
    if (IPsize > 64000 || IPsize < 0) {
-      MSG2("Invalid IP size in CREP: %ld - %s\n", IPsize, pptr -> procname);
+     printf("Invalid IP size in CREP: %ld - %s\n", IPsize, pptr -> procname.c_str());
       return(8);
       }
    int i = sizeof(IPh);
@@ -31,7 +31,7 @@ int thzcrep(Process *pptr, void **ptr, long IPsize, char *type)
 
    IPptr -> IP_size = IPsize;
    IPptr -> owner = pptr;
-   IPptr -> type = type;
+   IPptr -> type = new std::string(type);
    
    IPptr -> next_IP = 0;
    IPptr -> prev_IP = 0;
@@ -41,6 +41,6 @@ int thzcrep(Process *pptr, void **ptr, long IPsize, char *type)
    *ptr = tptr -> datapart;
    tptr -> datapart[IPsize] = guard_value;
    pptr -> owned_IPs++;
-   if (pptr->trace) MSG1("%s Crep end\n",pptr -> procname);
+   MSG1(pptr->trace,"%s Crep end\n",pptr -> procname.c_str());
    return(0);
 }

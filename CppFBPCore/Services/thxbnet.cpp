@@ -4,12 +4,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <algorithm>
+#include <iostream>
 
 #define MAXELEMNO 200
 #define INPUT 0
 #define OUTPUT 1
 
-Process * find_proc(proc_ent *proc_tab, char name[32]);
+Process * find_proc(proc_ent *proc_tab, std::string name);
 int thz(int code, Process *proc_ptr, ...);
 
 int thxbnet(label_ent * label_ptr, Process *mother,
@@ -35,14 +36,14 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 
   curr_proc = label_ptr -> proc_ptr;
 
-  while (curr_proc != 0) {
+  while (curr_proc != nullptr) {
     this_proc = new Process();
-    strcpy(this_proc -> procname, curr_proc -> proc_name);
-    strcpy(this_proc -> compname, curr_proc -> comp_name);
+    this_proc -> procname = curr_proc -> proc_name;
+    this_proc -> compname = curr_proc -> comp_name;
 
     this_proc -> network = network;
 
-    this_proc -> next_proc = 0;
+    this_proc -> next_proc = nullptr;
     //this_proc -> has_run = false;
 
     this_proc -> status = NOT_STARTED;
@@ -57,9 +58,9 @@ int thxbnet(label_ent * label_ptr, Process *mother,
     this_proc -> out_ports = 0;
     this_proc -> begin_port = 0;
     this_proc -> end_port = 0;
-    strcpy(this_proc -> int_pe.port_name, " ");
+    this_proc -> int_pe.port_name = " ";
     this_proc -> int_pe.elem_count = 1;
-    this_proc -> int_pe.cpptr = 0;
+    this_proc -> int_pe.cpptr = nullptr;
     this_proc -> int_pe.ret_code = 0;
     this_proc -> stack = 0;
     this_proc -> trace = curr_proc -> trace;
@@ -73,7 +74,7 @@ int thxbnet(label_ent * label_ptr, Process *mother,
   // now go through connection list - cnxt_ent's not Cnxt's
   curr_cnxt = label_ptr -> cnxt_ptr;
 
-  while (curr_cnxt != 0) {
+  while (curr_cnxt != nullptr) {
 
     /*
       if (curr_cnxt -> downstream_name[0] == '*') { 
@@ -100,13 +101,13 @@ int thxbnet(label_ent * label_ptr, Process *mother,
       */
     downstream_proc = find_proc(label_ptr -> proc_ptr,
 				curr_cnxt -> downstream_name);
-    if (downstream_proc == 0)
+    if (downstream_proc == nullptr)
       return(4);
 
     cpp = downstream_proc -> in_ports;
 
-    while (cpp != 0) {
-      if (strcmp(curr_cnxt -> downstream_port_name, cpp -> port_name) == 0)
+    while (cpp != nullptr) {
+      if (curr_cnxt -> downstream_port_name == cpp -> port_name)
 	break;
       cpp = cpp -> succ;
     }
@@ -118,7 +119,7 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 
     i++;
 
-    if (cpp != 0) {  //  matching port name found 
+    if (cpp != nullptr) {  //  matching port name found 
       cpp -> elem_count = std::max(cpp -> elem_count, i);
     }
     else {
@@ -128,14 +129,14 @@ int thxbnet(label_ent * label_ptr, Process *mother,
       // this shouldn't happen more than once for a given port name... 
 
       cpp =  (Port *)malloc(sizeof(Port) + MAXELEMNO * sizeof(cp_elem));
-      strcpy(cpp -> port_name, curr_cnxt -> downstream_port_name);
+      cpp -> port_name = curr_cnxt -> downstream_port_name;
       cpp -> elem_count = i;
       cpp -> direction = INPUT;
       cpp -> succ = downstream_proc -> in_ports;
       downstream_proc -> in_ports = cpp;
 
       for (i = 0; i < MAXELEMNO; i++) {
-	cpp -> elem_list[i].gen.connxn = 0;
+	cpp -> elem_list[i].gen.connxn = nullptr;
 	cpp -> elem_list[i].closed = false;
 	cpp -> elem_list[i].is_IIP = false;
 	cpp -> elem_list[i].subdef = false;
@@ -149,31 +150,29 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 
     if (curr_cnxt -> upstream_name[0] != '!') {
 
-      if ((cnxt_ptr = cpp -> elem_list[i].gen.connxn) == 0) {
+      if ((cnxt_ptr = cpp -> elem_list[i].gen.connxn) == nullptr) {
 	if (cpp -> elem_list[i].is_IIP)
 	  printf("Cannot have connection and IIP on same port element\n");
 	if (curr_cnxt -> upstream_name[0] == '*') {
 	  cpp2 = mother -> in_ports;
-	  while (cpp2 != 0) {
-	    if (strcmp(curr_cnxt -> upstream_port_name, cpp2 -> port_name) ==
-		0)
+	  while (cpp2 != nullptr) {
+	    if (curr_cnxt -> upstream_port_name == cpp2 -> port_name)
 	      break;
 	    cpp2 = cpp2 -> succ;
 	  }
-	  if (cpp2 == 0)
-	    cnxt_ptr = 0;
+	  if (cpp2 == nullptr)
+	    cnxt_ptr = nullptr;
 	  else
 	    {
-	      cnxt_ptr = (Cnxt *) cpp2 ->
+	      cnxt_ptr = cpp2 ->
 		elem_list[curr_cnxt -> upstream_elem_no].gen.connxn;
 	      if (cpp2 -> elem_list[curr_cnxt -> upstream_elem_no].subdef)
-		printf("Input port %s of subnet already defined\n",
-		       cpp2 -> port_name);
+		std::cout << "Input port " << cpp2 -> port_name << "of subnet already defined" << std::endl;
 	      else {
 		if (cnxt_ptr != 0) {
 		  cpp2 -> elem_list[curr_cnxt -> upstream_elem_no].subdef =
 		    true;
-		  if (cpp -> elem_list[i].gen.connxn != 0) {
+		  if (cpp -> elem_list[i].gen.connxn != nullptr) {
 		    printf("Connection already in use\n");
 		    return(4);
 		  }
@@ -184,13 +183,13 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 		    cpp -> elem_list[i].is_IIP = true;
 		  else {
 		    cnxt_ptr -> fed_proc = downstream_proc;
-		    strcpy(cnxt_ptr -> name, cnxt_ptr -> fed_proc -> procname); 
-		    strcat(cnxt_ptr -> name, ".");
-		    strcat(cnxt_ptr -> name, cpp2 -> port_name);
+		    cnxt_ptr -> name = cnxt_ptr -> fed_proc -> procname; 
+		    cnxt_ptr -> name +=  ".";
+		    cnxt_ptr -> name += cpp2 -> port_name;
 		    if (i > 0) {
-		      char no[12];
-		      sprintf(no, "[%d]", i); 
-		      strcat(cnxt_ptr -> name, no);
+		      // char no[12];
+		      // sprintf(no, "[%d]", i); 
+		      cnxt_ptr -> name += i;
 		    }
 		  }
 		}
@@ -206,8 +205,8 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 	cnxt_ptr -> succ = (Cnxt *)network -> first_cnxt;					
 	network -> first_cnxt = cnxt_ptr;
 
-	cnxt_ptr -> first_IPptr = 0;
-	cnxt_ptr -> last_IPptr = 0;
+	cnxt_ptr -> first_IPptr = nullptr;
+	cnxt_ptr -> last_IPptr = nullptr;
 	cnxt_ptr -> IPcount = 0;
 	cnxt_ptr -> max_IPcount = curr_cnxt -> capacity;
 	if (cnxt_ptr -> max_IPcount == -1)
@@ -216,7 +215,7 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 	cnxt_ptr -> total_upstream_proc_count = 0;
 	cnxt_ptr -> nonterm_upstream_proc_count = 0;
 	cnxt_ptr -> closed = false;
-	if (cpp -> elem_list[i].gen.connxn != 0) {
+	if (cpp -> elem_list[i].gen.connxn != nullptr) {
 	  printf("Connection already in use\n");
 	  return(4);
 	}
@@ -224,13 +223,11 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 	  cpp -> elem_list[i].gen.connxn = cnxt_ptr;
 
 	cnxt_ptr -> fed_proc = downstream_proc;
-	strcpy(cnxt_ptr -> name, cnxt_ptr -> fed_proc -> procname); 
-	strcat(cnxt_ptr -> name, ".");
-	strcat(cnxt_ptr -> name, cpp -> port_name);
+	cnxt_ptr -> name = cnxt_ptr -> fed_proc -> procname; 
+	cnxt_ptr -> name += ".";
+	cnxt_ptr -> name += cpp -> port_name;
 	if (i > 0) {
-	  char no[12];
-	  sprintf(no, "[%d]", i); 
-	  strcat(cnxt_ptr -> name, no);
+	  cnxt_ptr -> name += i;
 	}
 	//cnxt_ptr -> fedproc_wtg_to_recv = false;
       }
@@ -239,8 +236,8 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 				curr_cnxt -> upstream_name);
 
       cpp = upstream_proc -> out_ports;
-      while (cpp != 0) {
-	if (strcmp(curr_cnxt -> upstream_port_name, cpp -> port_name) == 0)
+      while (cpp != nullptr) {
+	if (curr_cnxt -> upstream_port_name == cpp -> port_name)
 	  break;
 	cpp = cpp -> succ;
       }
@@ -254,7 +251,7 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 
       i++;
 
-      if (cpp != 0) {  //  matching port name found 
+      if (cpp != nullptr) {  //  matching port name found 
 	cpp -> elem_count = std::max(cpp -> elem_count, i);
       }
       else {
@@ -264,14 +261,14 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 	// this shouldn't happen more than once for a given port name... 
 
 	cpp =  (Port *)malloc(sizeof(Port) + MAXELEMNO * sizeof(cp_elem));
-	strcpy(cpp -> port_name, curr_cnxt -> upstream_port_name);
+	cpp -> port_name = curr_cnxt -> upstream_port_name;
 	cpp -> elem_count = i;
 	cpp -> direction = OUTPUT;
 	cpp -> succ = upstream_proc -> out_ports;
 	upstream_proc -> out_ports = cpp;
 
 	for (i = 0; i < MAXELEMNO; i++) {
-	  cpp -> elem_list[i].gen.connxn = 0;
+	  cpp -> elem_list[i].gen.connxn = nullptr;
 	  cpp -> elem_list[i].closed = false;
 	  cpp -> elem_list[i].is_IIP = false;
 	  cpp -> elem_list[i].subdef = false;
@@ -289,7 +286,7 @@ int thxbnet(label_ent * label_ptr, Process *mother,
     }
     else
       cpp -> elem_list[i].is_IIP = true;
-    if (cpp -> elem_list[i].gen.connxn != 0) {
+    if (cpp -> elem_list[i].gen.connxn != nullptr) {
       printf("Connection already in use\n");
       return(4);
     }
@@ -302,10 +299,10 @@ int thxbnet(label_ent * label_ptr, Process *mother,
 
   curr_proc = label_ptr -> proc_ptr;
 
-  while (curr_proc != 0) {
+  while (curr_proc != nullptr) {
     this_proc = (Process *) curr_proc -> proc_block;
 
-    if (this_proc -> faddr == 0  /*&& !this_proc -> composite */) {
+    if (this_proc -> faddr == nullptr  /*&& !this_proc -> composite */) {
 
       if (curr_proc -> comp_name[0] == '\0') {
 	printf("Component name not filled in!\n");
@@ -345,10 +342,10 @@ int thxbnet(label_ent * label_ptr, Process *mother,
     //this_proc -> faddr =  curr_proc -> faddr;
     this_proc -> must_run = curr_proc -> must_run;  // undeleted as per John Revill
     cpp = this_proc -> out_ports;
-    while (cpp != 0)  {
+    while (cpp != nullptr)  {
       for (i = 0; i < cpp -> elem_count; i++) {
 	cnxt_ptr = cpp -> elem_list[i].gen.connxn;
-	if (cnxt_ptr == 0)
+	if (cnxt_ptr == nullptr)
 	  continue;
 	cnxt_ptr -> total_upstream_proc_count++;
 	cnxt_ptr -> nonterm_upstream_proc_count++;
@@ -365,17 +362,17 @@ int thxbnet(label_ent * label_ptr, Process *mother,
   return -1;
 }
 
-Process * find_proc(proc_ent *proc_tab, char name[32])
+Process * find_proc(proc_ent *proc_tab, std::string name)
 {
   proc_ent *PEptr;
   PEptr = proc_tab;
-  while (PEptr != 0) {
-    if (strcmp(PEptr -> proc_name, name) == 0)
+  while (PEptr != nullptr) {
+    if (PEptr -> proc_name == name)
       break;
     PEptr = PEptr -> succ;
   }
-  if (PEptr == 0) {
-    printf ("Process name %s not found\n", name);
+  if (PEptr == nullptr) {
+    std::cout << "Process name " << name << " not found" << std::endl;
     return(0);
   }
   return (Process *)(PEptr -> proc_block);

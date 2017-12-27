@@ -3,14 +3,13 @@
 #include <string.h>
 #include "compsvcs.h"
 
-THRCOMP ThRevers(_anchor proc_anchor)
+THRCOMP ThRevers(anchor proc_anchor)
 {
 	void *ptr;
 	void *optr;
 	int value;
 	long size;
-	long level = 0;
-	char *type;
+	std::string type;
 	port_ent port_tab[2];
 
 	value = dfsdfpt(proc_anchor, 2, port_tab,"IN","OUT");

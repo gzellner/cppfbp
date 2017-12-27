@@ -9,22 +9,22 @@ int thzdrop(Process *proc, void **ptr)
    IPh   *IPptr;
    IP   *tptr;
    
-   if (proc->trace) MSG1("%s Drop start\n", proc -> procname);
+   MSG1(proc->trace,"%s Drop start\n", proc -> procname.c_str());
    IPptr = (IPh   *) *ptr - 1;       /* back up size of header */
    tptr = (IP   *) IPptr;
    if (tptr -> datapart[IPptr -> IP_size] != guard_value)
-      MSG1("Guard byte corrupted - %s\n", proc->procname);
+     printf("Guard byte corrupted - %s\n", proc->procname.c_str());
    if (IPptr -> owner != proc)
-     MSG1("IP header corrupted - %s\n", proc->procname);
+     printf("IP header corrupted - %s\n", proc->procname.c_str());
    if (IPptr -> on_stack)
-     MSG1("IP on stack - %s\n", proc->procname);
-   
+     printf("IP on stack - %s\n", proc->procname.c_str());
+
    boost::lock_guard<boost::mutex> lock(proc -> network -> heapmtx);
    free(IPptr);
    //lock.~lock_guard();
     
    proc -> owned_IPs--;
-   if (proc->trace) MSG1("%s Drop end\n",proc -> procname);
+   MSG1(proc->trace,"%s Drop end\n",proc -> procname.c_str());
    *ptr = 0;
    return(0);
 }

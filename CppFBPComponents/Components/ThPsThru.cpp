@@ -1,14 +1,14 @@
 #include "compsvcs.h"
 #include <string.h>
 
-THRCOMP ThPsThru(_anchor proc_anchor)
+THRCOMP ThPsThru(anchor proc_anchor)
 
 // This component simply sends what it receives
 {
 	void *ptr;
 	int value;
 	long size;
-	char *type;
+	std::string type;
 	port_ent port_tab[2];
 
 	value = dfsdfpt(proc_anchor, 2, port_tab,"IN","OUT");

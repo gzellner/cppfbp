@@ -3,11 +3,11 @@ CPP=g++
 CPPFLAGS=-Wall -g -std=c++11 -I../../CppFBPCore/Headers
 LIBS=-lpthread -lboost_system
 INCLUDES=-Y../../CppFBPCore/Headers
-SRCS=dfs.cpp
+SRCS=InfQueue.cpp
 
 OBJS=$(SRCS:.cpp=.o)
 
-.PHONY: dpend clean
+.PHONY: clean
 
 all: $(OBJS)
 
@@ -22,4 +22,5 @@ depend: $(SRCS)
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-dfs.o: ../../CppFBPCore/Headers/thxanch.h
+InfQueue.o: ../../CppFBPCore/Headers/thxdef.h
+InfQueue.o: ../../CppFBPCore/Headers/thxanch.h

@@ -18,14 +18,14 @@ None
 #include <stdio.h>
 
 
-	THRCOMP ThFileWt(_anchor proc_anchor) {
+	THRCOMP ThFileWt(anchor proc_anchor) {
 
 
 		void *ptr;
 		char *dptr;
 		int value, i;
 		long size;
-		char *type;
+		std::string type;
 		char fname[256];
 		int ch;
 		port_ent port_tab[3];

@@ -20,27 +20,26 @@ not given.
 #include <string.h>
 #include "compsvcs.h"  
 
-THRCOMP ThFileRd(_anchor proc_anchor) {
+THRCOMP ThFileRd(anchor proc_anchor) {
 
 
 		void *ptr;
 		char fname[256];
 		char string[4096];
-		int value;
 		long size;
-		char *type;
+		std::string type;
 		size_t len;
 		port_ent port_tab[2];
 		FILE *f;
-		char A[2] = {"A"};
+		std::string A = "A";
 
 		printf("Read started!\n");
 		
-		value = dfsdfpt(proc_anchor, 2, port_tab, "OPT", "OUT");
+		dfsdfpt(proc_anchor, 2, port_tab, "OPT", "OUT");
 
 		/* read in the filename and open the input file
 		*/
-		value = dfsrecv(proc_anchor, &ptr, &port_tab[0], 0, &size, &type);
+		dfsrecv(proc_anchor, &ptr, &port_tab[0], 0, &size, &type);
 		memcpy(fname, ptr, size);
 		fname[size] = '\0';
 
@@ -48,7 +47,7 @@ THRCOMP ThFileRd(_anchor proc_anchor) {
 			fprintf(stderr, "Cannot open file %s!\n", fname);
 			return(8);
 		}
-		value = dfsdrop(proc_anchor, &ptr);
+		dfsdrop(proc_anchor, &ptr);
 
 		/* read records from the input file and create entities from them.  If the
 		input records are longer than 4096 bytes, they will be segmented and put out
@@ -58,9 +57,9 @@ THRCOMP ThFileRd(_anchor proc_anchor) {
 			len = strlen(string);
 			if (string[len - 1] == '\n')
 				len = len - 1;
-			value = dfscrep(proc_anchor, &ptr, static_cast<long>(len), A);
+			dfscrep(proc_anchor, &ptr, static_cast<long>(len), &A);
 			memcpy(ptr, string, len);
-			value = dfssend(proc_anchor, &ptr, &port_tab[1], 0);
+			dfssend(proc_anchor, &ptr, &port_tab[1], 0);
 		}
 		fclose(f);
 		return(0);

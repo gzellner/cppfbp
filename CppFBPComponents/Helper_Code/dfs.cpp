@@ -1,5 +1,5 @@
 #include <stdarg.h>
-   #include <string.h>
+   #include <string>
    #include <stdio.h>
 
    #include "thxanch.h"
@@ -24,7 +24,7 @@
  
   
 
-     int dfstest(_anchor proc_anchor)
+     int dfstest(anchor proc_anchor)
 {
    int value;
 
@@ -32,7 +32,7 @@
    return(value);
 }
 
-   int dfssend(_anchor proc_anchor, void **ptr, port_ent *peptr,
+   int dfssend(anchor proc_anchor, void **ptr, port_ent *peptr,
        int elem_no)
 {
    int value;
@@ -44,8 +44,8 @@
 }
 
 
-   int dfsrecv(_anchor proc_anchor, void **ptr, port_ent *peptr,
-       int elem_no, long *size, char **type)
+   int dfsrecv(anchor proc_anchor, void **ptr, port_ent *peptr,
+	       int elem_no, long *size, std::string *type)
 {
    int value;
 
@@ -54,7 +54,7 @@
    return(value);
 }
 
-   int dfscrep(_anchor proc_anchor, void **ptr, long size, char *type)
+int dfscrep(anchor proc_anchor, void **ptr, long size, std::string *type)
 {
    int value;
 
@@ -63,7 +63,7 @@
    return(value);
 }
 
- int dfsdrop(_anchor proc_anchor, void **ptr)
+ int dfsdrop(anchor proc_anchor, void **ptr)
 {
    int value;
 
@@ -71,7 +71,7 @@
    return(value);
 }
 
- int dfsdfpt(_anchor proc_anchor, int port_count, port_ent *peptr, ...)
+ int dfsdfpt(anchor proc_anchor, int port_count, port_ent *peptr, ...)
 {
    va_list ap;
    int i;
@@ -79,7 +79,7 @@
 
    va_start (ap, peptr);
    for (i = 0; i < port_count; i++) {
-	strcpy((peptr+i) -> port_name, va_arg(ap, char *));
+     (peptr+i) -> port_name = (va_arg(ap, char*));
 	//(peptr+i) -> reserved = 0;
 	(peptr+i) -> elem_count = 0;
 	(peptr+i) -> ret_code = 0;
@@ -91,7 +91,7 @@
    return(value);
 }
 
-   int dfspush(_anchor proc_anchor, void **ptr )
+   int dfspush(anchor proc_anchor, void **ptr )
 {
    int value;
 
@@ -100,7 +100,7 @@
 }
 
 
-   int dfspop(_anchor proc_anchor, void **ptr, long *size, char **type)
+int dfspop(anchor proc_anchor, void **ptr, long *size, std::string *type)
 {
    int value;
 
@@ -108,7 +108,7 @@
    return(value);
 }
 
-   int dfsclos(_anchor proc_anchor, port_ent *peptr,
+   int dfsclos(anchor proc_anchor, port_ent *peptr,
        int elem_no)
 {
    int value;
@@ -118,7 +118,7 @@
    return(value);
 }
    
-   long dfsgsize(_anchor proc_anchor, void **ptr) {
+   long dfsgsize(anchor proc_anchor, void **ptr) {
 long size;
 
    size = proc_anchor.svc_addr (NINE, proc_anchor.reserved, ptr);
@@ -126,7 +126,7 @@ long size;
    return(size);
 }
 
-int dfselct(_anchor proc_anchor, port_ent *peptr) {
+int dfselct(anchor proc_anchor, port_ent *peptr) {
 int ct;
 
    ct = proc_anchor.svc_addr (TEN, proc_anchor.reserved, peptr);
@@ -134,7 +134,7 @@ int ct;
    return(ct);
 }
  
- int dfssendc(_anchor proc_anchor, void **ptr, char * port)
+int dfssendc(anchor proc_anchor, void **ptr, std::string *port)
 {
    int value;
 
@@ -144,7 +144,7 @@ int ct;
 }
 
 
-   int dfsrecvc(_anchor proc_anchor, void **ptr, char * port, long *size, char **type)
+int dfsrecvc(anchor proc_anchor, void **ptr, std::string *port, long *size, std::string *type)
 {
    int value;
 
@@ -152,14 +152,14 @@ int ct;
    return(value);
 }
 
-     int dfsclosc(_anchor proc_anchor, char * port)
+int dfsclosc(anchor proc_anchor, std::string *port)
 {
    int value;
 
    value = proc_anchor.svc_addr (THIRTEEN, proc_anchor.reserved, port);
    return(value);
 }
- int dfselctc(_anchor proc_anchor, char * port) {
+int dfselctc(anchor proc_anchor, std::string *port) {
 int ct;
 
    ct = proc_anchor.svc_addr (FOURTEEN, proc_anchor.reserved, port);

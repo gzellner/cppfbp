@@ -7,13 +7,13 @@
 #include "cppfbp.h"
 #define OUTPUT 1
 
-THRCOMP SubOut(_anchor proc_anchor)
+THRCOMP SubOut(anchor proc_anchor)
 {
 	void *ptr;	
-	char pname[256];
+	std::string pname;
 	int value;
 	long size;
-	char *type;
+	std::string type;
 	port_ent port_tab[2];
 
 	port_ent mother_port;	
@@ -22,7 +22,7 @@ THRCOMP SubOut(_anchor proc_anchor)
 
 	value = dfsrecv(proc_anchor, &ptr, &port_tab[0], 0, &size, &type);
 
-	memcpy(pname,ptr,size);
+	pname.assign((char*)ptr,(size_t)size);
 	pname[size] = '\0';
 
 	value = dfsdrop(proc_anchor, &ptr);
@@ -31,20 +31,20 @@ THRCOMP SubOut(_anchor proc_anchor)
 	proc = proc -> mother_proc;
 
 	Port* cpp = proc -> out_ports;
-	while (cpp != 0)
+	while (cpp != nullptr)
 	{
-		if (0 == strcmp(cpp->port_name, pname))
+		if (cpp->port_name == pname)
 			break;
 		cpp = cpp -> succ;
 	}
 
-	if (cpp == 0) {
+	if (cpp == nullptr) {
 		printf ("Port name %s not found\n",
-			pname); 
+			pname.c_str()); 
 		return(8);
 	}
 
-	strcpy(mother_port.port_name, cpp -> port_name);
+	mother_port.port_name = cpp -> port_name;
 	//cpp -> direction = OUTPUT;
 	mother_port.cpptr = cpp;
 	mother_port.elem_count = cpp -> elem_count;

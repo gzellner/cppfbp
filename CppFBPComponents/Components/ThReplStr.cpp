@@ -2,13 +2,13 @@
 #include "compsvcs.h"
 // This component simply makes a shallow copy, drops the original, and sends out the copy to all elements of the output port
 
-THRCOMP ThReplStr(_anchor proc_anchor)
+THRCOMP ThReplStr(anchor proc_anchor)
 {
 	void *ptr;
 	void *ptr2;
 	int value;
 	long size;
-	char *type;
+	std::string type;
 	port_ent port_tab[2];
 
 	value = dfsdfpt(proc_anchor, 2, port_tab,"IN","OUT");
@@ -17,7 +17,7 @@ THRCOMP ThReplStr(_anchor proc_anchor)
 	int no = dfselct(proc_anchor, &port_tab[1]);
 	while (value == 0) {
 		for (int i = 0; i < no; i++) {
-			value = dfscrep(proc_anchor, &ptr2, size, type);
+			value = dfscrep(proc_anchor, &ptr2, size, &type);
 			memcpy(ptr2,ptr,size);
 			value = dfssend(proc_anchor, &ptr2, &port_tab[1], i);  
 		}

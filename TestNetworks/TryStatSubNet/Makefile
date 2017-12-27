@@ -3,10 +3,10 @@ CPP=g++
 CPPFLAGS=-Wall -g -std=c++11 -I../../CppFBPCore/Headers
 LIBS=-lpthread -lboost_system -lboost_thread -lboost_chrono
 INCLUDES=-Y../../CppFBPCore/Headers
-SRCS=CopyFile.cpp
-PROG=copyfile
+SRCS=TryStatSubNet.cpp
+PROG=trystat
 
-OBJCPP=$(wildcard ../../CppFBPCore/Services/*.cpp) $(wildcard ../../CppFBPCore/intcomps/*.cpp) ../../CppFBPComponents/Components/ThFileRd.cpp ../../CppFBPComponents/Components/ThFileWt.cpp ../../CppFBPComponents/Components/ThCopyNL.cpp $(wildcard ../../CppFBPComponents/Helper_Code/*.cpp)
+OBJCPP=$(wildcard ../../CppFBPCore/Services/*.cpp) $(wildcard ../../CppFBPCore/intcomps/*.cpp) ../../CppFBPComponents/Components/SubIn.cpp ../../CppFBPComponents/Components/SubOut.cpp ../../CppFBPComponents/Components/ThFileRd.cpp ../../CppFBPComponents/Components/ThFileWt.cpp ../../CppFBPComponents/Components/ThCopyNL.cpp ../../TestSubnets/Subnets/InfQueue.cpp $(wildcard ../../CppFBPComponents/Helper_Code/*.cpp)
 
 OBJ=$(OBJCPP:.cpp=.o)
 OBJS=$(SRCS:.cpp=.o)
@@ -22,6 +22,7 @@ $(PROG): $(OBJ) $(OBJS)
 	$(MAKE) -C ../../CppFBPCore/Services
 	$(MAKE) -C ../../CppFBPCore/intcomps
 	$(MAKE) -C ../../CppFBPComponents/Components
+	$(MAKE) -C ../../TestSubnets/Subnets
 	$(MAKE) -C ../../CppFBPComponents/Helper_Code
 	$(CPP) $(CPPFLAGS) -c $(SRCS) # $<
 

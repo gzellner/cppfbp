@@ -1,10 +1,12 @@
 
 #pragma once
 
+#include <string>
+
 class Network
 {
  public:
-  char name[128];             // name of application
+  std::string name;             // name of application
 
   Process* first_child_proc;  // ptr to first child process
   Process* first_child_comp;  // ptr to first child component
@@ -26,7 +28,7 @@ class Network
   void waitForAll();
   void thxfcbs();
   bool deadlock_test();
-  void go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anchor proc_anchor); 
+  void go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, anchor proc_anchor); 
 };
 
 
@@ -34,6 +36,6 @@ class SubNet:Network
 {
  public:
   //	char name[32];             // name of subnet
-  void go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, _anchor proc_anchor); 
+  void go(label_ent *label_blk, bool dynam, FILE *fp, bool timereq, anchor proc_anchor); 
 };
 

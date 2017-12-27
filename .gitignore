@@ -3,6 +3,7 @@
 *.o
 *.bak
 copyfile
+trystat
 output.fil
 TAGS
 

@@ -35,18 +35,18 @@ void  scan_blanks(FILE *fp);
 extern char curr_char;
 
 
-int thxgatrs(char * comp) {
+int thxgatrs(std::string &comp) {
 
   char *o_ptr;
-  char out_str[255];
+  char out_str[256];
   int atr = 0;
-  char fname[256];
+  std::string fname;
   FILE *fp = NULL;
 
-  strcpy(fname,comp);
-  strcat(fname,".atr");
+  fname = comp;
+  fname += ".atr";
   FILE* pFile;
-  pFile = fopen(fname,"r");
+  pFile = fopen(fname.c_str(),"r");
 	   
   if (pFile == NULL)
     return(-1);

@@ -22,9 +22,9 @@ void  CppFBP(label_ent* label_blk, bool dynam, FILE * fp, bool timereq);
 //__declspec(dllimport/dllexport) keywords, combined with extern "C"
 
 
-THRCOMP ThFileWt(_anchor anch);
-THRCOMP ThCopyNL(_anchor anch);
-THRCOMP ThFileRd(_anchor anch);
+THRCOMP ThFileWt(anchor anch);
+THRCOMP ThCopyNL(anchor anch);
+THRCOMP ThFileRd(anchor anch);
 
 int cap = 2;
 int elem0 = 0;

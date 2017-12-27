@@ -13,19 +13,25 @@
 #include "network.h"
 
 #define GEN_BOOST
+//#define TRACE_M
 
-#define MSG0(text)  {printf(text);		\
-
-#define MSG1(text,par1)  {printf(text, par1);	\
-  }
+#ifdef TRACE_M
+#define MSG1(trace,text,par1) if(trace){printf(text, par1);}
   // Define 2-parameter macro for tracing
+#else
+#define MSG1(trace,text,par1)
+#endif
 
-#define MSG2(text,par1,par2) {printf(text, par1, par2); \
-  }
+#ifdef TRACE_M
+#define MSG2(trace,text,par1,par2) if(trace){printf(text, par1, par2);}
+#else
+#define MSG2(trace,text,par1,par2)
+#endif
 
-  // Define 3-parameter macro for tracing
-
-#define MSG3(text,par1,par2,par3) { printf(text, par1, par2, par3);	\
-  }
+#ifdef TRACE_M
+#define MSG3(trace,text,par1,par2,par3) if(trace){printf(text, par1, par2, par3);}
+#else
+#define MSG3(trace,text,par1,par2,par3)
+#endif
 
 

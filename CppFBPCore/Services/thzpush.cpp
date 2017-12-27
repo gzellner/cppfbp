@@ -9,15 +9,15 @@ int thzpush(Process *pptr, void **ptr)
   // IPh   *qptr;
    IP   *tptr;
 
-   if (pptr -> trace) MSG1("%s Push start\n", pptr -> procname);
+   MSG1(pptr->trace,"%s Push start\n", pptr -> procname.c_str());
    IPptr = (IPh   *) *ptr - 1;       /* back up size of header */
    tptr = (IP *)IPptr;
    if (tptr -> datapart[IPptr -> IP_size] != guard_value)
-      MSG1("Guard byte corrupted: '%s'\n", pptr->procname);
+      printf("Guard byte corrupted: '%s'\n", pptr->procname.c_str());
    if (IPptr -> owner != pptr)
-     MSG1("IP header corrupted: '%s'\n", pptr->procname);
+     printf("IP header corrupted: '%s'\n", pptr->procname.c_str());
    if (IPptr -> on_stack)
-     MSG1("IP on stack: '%s'\n", pptr->procname);
+     printf("IP on stack: '%s'\n", pptr->procname.c_str());
    //optr = IPptr -> prev_IP;
    //qptr = IPptr -> next_IP;
   // if (optr != 0)
@@ -29,7 +29,7 @@ int thzpush(Process *pptr, void **ptr)
    IPptr -> next_IP = pptr -> stack;
    pptr -> stack = IPptr;
    IPptr -> on_stack = true;
-   if (pptr -> trace) MSG1("%s Push end\n",pptr -> procname);
+   MSG1(pptr->trace,"%s Push end\n",pptr -> procname.c_str());
    *ptr = 0;
    pptr -> owned_IPs--;
    return(0);
